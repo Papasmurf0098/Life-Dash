@@ -1,0 +1,128 @@
+<svg width="1200" height="320" viewBox="0 0 1200 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lavenderFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#EEF0FF" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#D9CCFF" stop-opacity="0.28" />
+    </linearGradient>
+    <linearGradient id="coinFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FFD96B" />
+      <stop offset="100%" stop-color="#FFB347" />
+    </linearGradient>
+    <style>
+      .outline { stroke: #4D70CC; stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+      .wash { fill: url(#lavenderFill); }
+      .coin { fill: url(#coinFill); stroke: #4D70CC; stroke-width: 8; }
+      .thin { stroke-width: 6; }
+    </style>
+  </defs>
+
+  <g transform="translate(18 22)">
+    <path class="wash outline" d="M18 34h84c10 0 18 8 18 18v42c0 10-8 18-18 18H18c-10 0-18-8-18-18V52c0-10 8-18 18-18Z" />
+    <path class="outline" d="M10 54h110" />
+    <circle class="coin" cx="92" cy="74" r="18" />
+    <path class="thin outline" d="M88 74h8m-4-4v8" />
+  </g>
+
+  <g transform="translate(162 18)">
+    <path class="wash outline" d="M64 38c30 0 54 18 54 42s-24 42-54 42c-26 0-46-14-52-34l-12-32" />
+    <path class="outline" d="M24 56c8-16 24-26 40-26" />
+    <circle class="coin" cx="108" cy="26" r="18" />
+    <path class="thin outline" d="M104 26h8m-4-4v8" />
+    <path class="thin outline" d="M48 124v26m34-20c-8 10-24 18-38 18" />
+  </g>
+
+  <g transform="translate(324 30)">
+    <path class="outline" d="M0 110h120" />
+    <rect class="wash outline" x="8" y="74" width="20" height="36" rx="8" />
+    <rect class="wash outline" x="44" y="50" width="20" height="60" rx="8" />
+    <rect class="wash outline" x="80" y="26" width="20" height="84" rx="8" />
+    <path class="outline" d="M18 26 46 2l24 20 34-22" />
+    <path class="outline" d="m90 0 14 0 0 14" />
+  </g>
+
+  <g transform="translate(470 40)">
+    <rect class="wash outline" x="0" y="24" width="116" height="78" rx="18" />
+    <path class="outline" d="M0 50h116" />
+    <rect class="wash outline" x="32" y="0" width="52" height="30" rx="8" />
+    <path class="thin outline" d="M20 72h76" />
+    <path class="thin outline" d="M20 90h42" />
+  </g>
+
+  <g transform="translate(628 38)">
+    <ellipse class="coin" cx="42" cy="28" rx="34" ry="18" />
+    <path class="coin" d="M8 28v24c0 10 15 18 34 18s34-8 34-18V28" />
+    <ellipse class="coin" cx="104" cy="60" rx="28" ry="15" />
+    <path class="coin" d="M76 60v18c0 8 12 15 28 15s28-7 28-15V60" />
+    <path class="thin outline" d="M38 28h8m-4-4v8" />
+  </g>
+
+  <g transform="translate(760 16)">
+    <path class="wash outline" d="M12 54 66 10l54 44" />
+    <path class="wash outline" d="M24 54h84v66H24z" />
+    <path class="outline" d="M40 54v66M60 54v66M80 54v66" />
+    <path class="outline" d="M12 120h108" />
+  </g>
+
+  <g transform="translate(932 26)">
+    <path class="wash outline" d="M0 14h92v112H0z" />
+    <path class="outline" d="M60 14v32h32" />
+    <path class="thin outline" d="M18 52h56M18 74h56M18 96h40" />
+    <circle class="coin" cx="82" cy="104" r="18" />
+    <path class="thin outline" d="M78 104h8m-4-4v8" />
+  </g>
+
+  <g transform="translate(18 178)">
+    <circle class="wash outline" cx="58" cy="58" r="54" />
+    <circle class="outline" cx="58" cy="58" r="26" />
+    <path class="outline" d="M58 58 86 42" />
+    <circle class="coin" cx="58" cy="58" r="8" />
+  </g>
+
+  <g transform="translate(166 184)">
+    <rect class="wash outline" x="0" y="0" width="104" height="120" rx="20" />
+    <rect class="wash outline" x="22" y="22" width="60" height="26" rx="8" />
+    <circle class="outline thin" cx="26" cy="72" r="8" />
+    <circle class="outline thin" cx="52" cy="72" r="8" />
+    <circle class="outline thin" cx="78" cy="72" r="8" />
+    <circle class="outline thin" cx="26" cy="98" r="8" />
+    <circle class="outline thin" cx="52" cy="98" r="8" />
+    <circle class="outline thin" cx="78" cy="98" r="8" />
+  </g>
+
+  <g transform="translate(318 190)">
+    <rect class="wash outline" x="24" y="0" width="84" height="102" rx="18" />
+    <path class="outline" d="M24 22h84" />
+    <path class="outline" d="M0 112 128 112" />
+    <path class="thin outline" d="M44 44h46M44 64h46M44 84h30" />
+    <circle class="coin" cx="98" cy="84" r="16" />
+  </g>
+
+  <g transform="translate(482 184)">
+    <rect class="wash outline" x="0" y="20" width="112" height="82" rx="16" />
+    <circle class="outline" cx="38" cy="62" r="22" />
+    <path class="outline" d="M38 62h26" />
+    <circle class="coin" cx="92" cy="38" r="18" />
+    <path class="thin outline" d="M88 38h8m-4-4v8" />
+  </g>
+
+  <g transform="translate(634 176)">
+    <path class="wash outline" d="M18 118h86c8 0 14-6 14-14V28c0-8-6-14-14-14H18C10 14 4 20 4 28v76c0 8 6 14 14 14Z" />
+    <path class="outline" d="M22 14v-10m34 10v-10m34 10v-10" />
+    <path class="thin outline" d="M28 44h56M28 68h60M28 92h42" />
+    <circle class="coin" cx="96" cy="90" r="18" />
+  </g>
+
+  <g transform="translate(792 184)">
+    <path class="wash outline" d="M0 34c0-12 10-22 22-22h48c12 0 22 10 22 22v34c0 12-10 22-22 22H22C10 90 0 80 0 68Z" />
+    <path class="outline" d="M26 112c6-14 18-22 34-22s28 8 34 22" />
+    <circle class="coin" cx="78" cy="20" r="18" />
+    <path class="thin outline" d="M74 20h8m-4-4v8" />
+  </g>
+
+  <g transform="translate(946 184)">
+    <path class="wash outline" d="M0 34c0-12 10-22 22-22h54c12 0 22 10 22 22v62c0 12-10 22-22 22H22C10 118 0 108 0 96Z" />
+    <path class="outline" d="M26 46h46M26 68h46M26 90h30" />
+    <path class="outline" d="M78 20h8l12 14v72" />
+    <path class="coin" d="M80 112h30" />
+  </g>
+</svg>

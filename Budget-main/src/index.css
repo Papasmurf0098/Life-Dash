@@ -1,0 +1,138 @@
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #86fff7;
+  --bg-strong: #00d8c7;
+  --ink: #10232c;
+  --muted: #144d61;
+  --accent: #00fff2;
+  --accent-strong: #00b8ff;
+  --success: #00c853;
+  --danger: #f35f34;
+  --panel: linear-gradient(
+    145deg,
+    rgba(255, 251, 255, 0.96) 0%,
+    rgba(242, 235, 255, 0.94) 48%,
+    rgba(224, 217, 255, 0.92) 100%
+  );
+  --panel-card: linear-gradient(
+    145deg,
+    rgba(250, 244, 255, 0.84) 0%,
+    rgba(234, 239, 255, 0.76) 100%
+  );
+  --panel-soft: rgba(181, 163, 255, 0.18);
+  --edge: rgba(129, 104, 214, 0.22);
+  --edge-soft: rgba(255, 255, 255, 0.82);
+  --shadow-strong: rgba(16, 35, 44, 0.16);
+  --shadow-soft: rgba(16, 35, 44, 0.08);
+  --hero-glow-a: rgba(0, 255, 242, 0.52);
+  --hero-glow-b: rgba(243, 95, 52, 0.24);
+  --hero-surface-a: rgba(251, 245, 255, 0.98);
+  --hero-surface-b: rgba(205, 255, 246, 0.9);
+  --graphic-surface-a: rgba(231, 255, 252, 0.96);
+  --graphic-surface-b: rgba(94, 255, 235, 0.88);
+  --graphic-halo: rgba(0, 255, 242, 0.9);
+  --graphic-ring: rgba(124, 94, 223, 0.24);
+  --graphic-ring-alt: rgba(243, 95, 52, 0.24);
+  --chip-bg: rgba(0, 255, 242, 0.14);
+  --danger-soft: rgba(243, 95, 52, 0.14);
+  --field-bg: linear-gradient(
+    180deg,
+    rgba(255, 251, 255, 0.98) 0%,
+    rgba(245, 239, 255, 0.95) 100%
+  );
+  --focus-outline: rgba(145, 114, 255, 0.24);
+  --focus-border: rgba(111, 83, 235, 0.58);
+  --focus-shadow: rgba(145, 114, 255, 0.16);
+  --page-glow-a: rgba(0, 255, 242, 0.48);
+  --page-glow-b: rgba(243, 95, 52, 0.2);
+  --page-glow-c: rgba(0, 200, 83, 0.16);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #140b2d;
+  --bg-strong: #0b1736;
+  --ink: #eef4ff;
+  --muted: #99a9d6;
+  --accent: #5a70ff;
+  --accent-strong: #36d98a;
+  --success: #36d98a;
+  --danger: #ff7c73;
+  --panel: linear-gradient(145deg, rgba(21, 24, 53, 0.9), rgba(17, 27, 63, 0.82));
+  --panel-card: linear-gradient(145deg, rgba(38, 44, 90, 0.76), rgba(27, 35, 77, 0.68));
+  --panel-soft: rgba(38, 44, 90, 0.72);
+  --edge: rgba(137, 158, 255, 0.18);
+  --edge-soft: rgba(255, 255, 255, 0.06);
+  --shadow-strong: rgba(3, 5, 20, 0.45);
+  --shadow-soft: rgba(3, 5, 20, 0.28);
+  --hero-glow-a: rgba(113, 79, 255, 0.32);
+  --hero-glow-b: rgba(47, 124, 255, 0.24);
+  --hero-surface-a: rgba(30, 28, 73, 0.96);
+  --hero-surface-b: rgba(14, 29, 67, 0.9);
+  --graphic-surface-a: rgba(30, 35, 76, 0.92);
+  --graphic-surface-b: rgba(11, 23, 54, 0.88);
+  --graphic-halo: rgba(77, 122, 255, 0.62);
+  --graphic-ring: rgba(54, 217, 138, 0.24);
+  --graphic-ring-alt: rgba(113, 79, 255, 0.28);
+  --chip-bg: rgba(54, 217, 138, 0.12);
+  --danger-soft: rgba(255, 124, 115, 0.14);
+  --field-bg: linear-gradient(180deg, rgba(14, 18, 43, 0.96), rgba(10, 15, 38, 0.92));
+  --focus-outline: rgba(90, 112, 255, 0.28);
+  --focus-border: rgba(90, 112, 255, 0.58);
+  --focus-shadow: rgba(90, 112, 255, 0.16);
+  --page-glow-a: rgba(77, 122, 255, 0.22);
+  --page-glow-b: rgba(113, 79, 255, 0.22);
+  --page-glow-c: rgba(54, 217, 138, 0.12);
+  --font-body: 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', serif;
+}
+
+:root {
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top, var(--page-glow-a), transparent 24%),
+    radial-gradient(circle at 85% 16%, var(--page-glow-b), transparent 20%),
+    radial-gradient(circle at 18% 78%, var(--page-glow-c), transparent 24%),
+    linear-gradient(180deg, var(--bg), var(--bg-strong));
+  font-family: var(--font-body);
+  line-height: 1.5;
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100svh;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at top, var(--page-glow-a), transparent 24%),
+    radial-gradient(circle at 85% 16%, var(--page-glow-b), transparent 20%),
+    radial-gradient(circle at 18% 78%, var(--page-glow-c), transparent 24%),
+    linear-gradient(180deg, var(--bg), var(--bg-strong));
+  transition:
+    background 220ms ease,
+    color 220ms ease;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+#root {
+  min-height: 100svh;
+}

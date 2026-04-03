@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shift Income Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root{
+      --bg:#0b0f10;
+      --panel:#12191b;
+      --panel-2:#182224;
+      --panel-3:#0f1517;
+      --text:#e8f6f5;
+      --muted:#9bb8b6;
+      --accent:#25dbc8;
+      --accent-2:#14b8a6;
+      --danger:#ff5f6d;
+      --warn:#ffb84d;
+      --border:#233336;
+      --shadow:0 10px 28px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(37,219,200,.08), transparent 26%),
+        radial-gradient(circle at top left, rgba(37,219,200,.05), transparent 22%),
+        var(--bg);
+      color:var(--text);
+      padding:12px;
+    }
+
+    .app{ max-width:1360px; margin:0 auto; }
+
+    .hero,
+    .summary-hero,
+    .drawer,
+    .cabinet,
+    .panel{ box-shadow:var(--shadow); }
+
+    .hero{
+      background:linear-gradient(180deg, rgba(37,219,200,.12), rgba(37,219,200,.04));
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:22px 18px;
+      margin-bottom:18px;
+    }
+
+    .hero h1{ margin:0; font-size:1.55rem; color:var(--accent); letter-spacing:.3px; }
+    .hero p{ margin:8px 0 0 0; color:var(--muted); line-height:1.45; font-size:.98rem; }
+
+    .summary-hero{
+      background:linear-gradient(180deg, rgba(37,219,200,.10), rgba(37,219,200,.03));
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:16px;
+      margin-bottom:16px;
+    }
+
+    .summary-hero-title{ font-size:1rem; font-weight:800; color:var(--accent); margin:0 0 8px 0; }
+    .summary-hero-text{ color:var(--text); line-height:1.55; font-size:.98rem; margin:0; }
+    .summary-hero-sub{ color:var(--muted); font-size:.84rem; margin-top:10px; line-height:1.4; }
+
+    .cabinet-grid,
+    .lower-grid,
+    .charts-grid,
+    .input-grid,
+    .filter-grid,
+    .stats-grid,
+    #baselineCards{
+      display:grid;
+      gap:16px;
+      grid-template-columns:1fr;
+    }
+
+    .cabinet-grid,
+    .lower-grid,
+    .charts-grid{ margin-bottom:16px; }
+
+    .drawer,
+    .cabinet,
+    .panel{
+      background:linear-gradient(180deg, var(--panel), var(--panel-3));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      overflow:hidden;
+      min-width:0;
+    }
+
+    .drawer-header,
+    .cabinet-header,
+    .panel-header{
+      padding:14px 16px 10px;
+      border-bottom:1px solid rgba(255,255,255,.04);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+    }
+
+    .drawer-title,
+    .cabinet-title,
+    .panel-title{ font-size:1rem; font-weight:700; color:var(--accent); margin:0; }
+    .drawer-sub,
+    .cabinet-sub{ color:var(--muted); font-size:.88rem; margin-top:4px; line-height:1.35; }
+    .drawer-body,
+    .cabinet-body,
+    .panel-body{ padding:16px; }
+
+    .field{ display:flex; flex-direction:column; gap:6px; min-width:0; }
+    .field.full{ grid-column:1 / -1; }
+
+    label{ font-size:.86rem; color:var(--muted); font-weight:600; }
+
+    input,
+    select,
+    button,
+    textarea{
+      width:100%;
+      min-width:0;
+      border:none;
+      border-radius:14px;
+      padding:12px 13px;
+      font-size:16px;
+      font-family:inherit;
+    }
+
+    input,
+    select,
+    textarea{
+      background:var(--panel-2);
+      color:var(--text);
+      border:1px solid #294042;
+      outline:none;
+      -webkit-appearance:none;
+      appearance:none;
+    }
+
+    input[type="checkbox"]{
+      -webkit-appearance:auto;
+      appearance:auto;
+      background:auto;
+      border:none;
+      box-shadow:none;
+    }
+
+    input[type="date"]{
+      min-height:46px;
+      appearance:auto;
+      -webkit-appearance:auto;
+    }
+
+    textarea{ min-height:92px; resize:vertical; }
+
+    input:focus,
+    select:focus,
+    textarea:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(37,219,200,.14);
+    }
+
+    button{
+      cursor:pointer;
+      font-weight:800;
+      letter-spacing:.2px;
+      transition:transform .08s ease, opacity .15s ease;
+    }
+    button:active{ transform:scale(.985); }
+
+    .button-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .primary-btn{ background:linear-gradient(180deg, var(--accent), var(--accent-2)); color:#051313; }
+    .secondary-btn{ background:#1a2628; color:var(--text); border:1px solid #294042; }
+    .warning-btn{ background:rgba(255,184,77,.12); color:#ffd08a; border:1px solid rgba(255,184,77,.25); }
+    .danger-btn{ background:rgba(255,95,109,.13); color:#ff8d96; border:1px solid rgba(255,95,109,.25); }
+
+    .stat-card{
+      background:linear-gradient(180deg, #152022, #101719);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      min-height:92px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      min-width:0;
+    }
+
+    .stat-label{ color:var(--muted); font-size:.82rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
+    .stat-value{ color:var(--text); font-size:1.2rem; font-weight:800; margin-top:8px; line-height:1.2; word-break:break-word; }
+    .wide{ grid-column:1 / -1; }
+    .week-range{ color:var(--accent); font-weight:700; font-size:.92rem; margin-top:4px; }
+
+    .mini-list{ display:grid; gap:10px; }
+
+    .mini-item{
+      background:linear-gradient(180deg, #162123, #12191b);
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 13px;
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      min-width:0;
+    }
+
+    .mini-item .name{ color:var(--text); font-weight:700; line-height:1.35; min-width:0; }
+    .mini-item .value{ color:var(--accent); font-weight:800; white-space:normal; text-align:right; line-height:1.35; }
+
+    .chart-wrap{ height:300px; position:relative; }
+
+    .table-shell{
+      overflow-x:auto;
+      border-radius:16px;
+      border:1px solid var(--border);
+      background:#0f1517;
+    }
+
+    table{ width:100%; border-collapse:collapse; min-width:1100px; }
+    th, td{ padding:12px 10px; text-align:left; border-bottom:1px solid rgba(255,255,255,.05); font-size:.94rem; vertical-align:top; }
+    th{ color:var(--accent); background:#132022; position:sticky; top:0; z-index:1; }
+    td{ color:#dcebea; }
+    tr:hover td{ background:rgba(37,219,200,.04); }
+
+    .tag-wrap{ display:flex; flex-wrap:wrap; gap:6px; }
+    .tag-pill{ display:inline-block; padding:7px 10px; border-radius:999px; background:#1b2b2d; border:1px solid #274143; color:var(--accent); font-size:.8rem; font-weight:700; text-transform:capitalize; }
+    .action-cell{ white-space:normal; }
+    .table-btn{ width:auto; padding:8px 10px; border-radius:10px; font-weight:800; margin-right:6px; margin-bottom:6px; }
+    .edit-btn{ background:rgba(37,219,200,.12); color:var(--accent); border:1px solid rgba(37,219,200,.25); }
+    .delete-btn{ background:rgba(255,95,109,.13); color:#ff8d96; border:1px solid rgba(255,95,109,.25); }
+
+    .muted-note{ color:var(--muted); font-size:.85rem; line-height:1.45; }
+
+    .summary-row{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .summary-chip{ background:#142022; border:1px solid var(--border); border-radius:14px; padding:12px; }
+    .summary-chip .label{ color:var(--muted); font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+    .summary-chip .value{ margin-top:6px; color:var(--accent); font-weight:800; font-size:1rem; line-height:1.35; word-break:break-word; }
+
+    details.week-card{ border:1px solid var(--border); border-radius:14px; background:linear-gradient(180deg, #162123, #12191b); overflow:hidden; }
+    details.week-card + details.week-card{ margin-top:10px; }
+    details.week-card summary{ list-style:none; cursor:pointer; padding:14px 14px; display:flex; justify-content:space-between; gap:10px; align-items:center; color:var(--text); font-weight:700; }
+    details.week-card summary::-webkit-details-marker{ display:none; }
+    .week-meta{ color:var(--accent); font-weight:800; white-space:nowrap; }
+    .week-body{ border-top:1px solid rgba(255,255,255,.05); padding:12px 14px 14px; }
+    .empty-state{ color:var(--muted); padding:8px 0; }
+    .hidden{ display:none !important; }
+
+    .checkbox-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .check-pill{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:14px;
+      background:var(--panel-2);
+      border:1px solid #294042;
+      transition:border-color .15s ease, box-shadow .15s ease, background .15s ease;
+      min-width:0;
+    }
+
+    .check-pill:has(input:checked){
+      border-color:var(--accent);
+      background:rgba(37,219,200,.10);
+      box-shadow:0 0 0 2px rgba(37,219,200,.10) inset;
+    }
+
+    .check-pill input{
+      width:18px;
+      height:18px;
+      margin:0;
+      accent-color:var(--accent);
+      flex:0 0 auto;
+    }
+
+    .check-pill label{
+      margin:0;
+      color:var(--text);
+      font-size:.92rem;
+      font-weight:700;
+      cursor:pointer;
+      user-select:none;
+      min-width:0;
+    }
+
+    .note-cell{ max-width:300px; white-space:normal; line-height:1.4; color:var(--muted); }
+
+    @media (min-width: 700px){
+      .filter-grid,
+      .summary-row,
+      .checkbox-grid,
+      .button-row{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+    }
+
+    @media (min-width: 900px){
+      body{ padding:18px; }
+      .hero h1{ font-size:1.9rem; }
+      .lower-grid,
+      .charts-grid,
+      .stats-grid,
+      #baselineCards{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+      .summary-row{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+      .checkbox-grid{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+    }
+
+    @media (min-width: 1100px){
+      .cabinet-grid{ grid-template-columns:1.2fr .8fr; }
+      .input-grid{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+      .filter-grid{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+      .button-row{ grid-template-columns:repeat(5, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="hero">
+      <h1>Shift Income Dashboard</h1>
+      <p>
+        Track sections, tags, notes, weekly and monthly trends, and the patterns behind good shifts without letting the data turn into swamp soup.
+      </p>
+    </section>
+
+    <section class="summary-hero">
+      <h2 class="summary-hero-title">Executive Summary</h2>
+      <p class="summary-hero-text" id="executiveSummaryText">
+        Add a few shifts and this panel will start translating the numbers into plain-English takeaways.
+      </p>
+      <div class="summary-hero-sub" id="executiveSummarySub">
+        Summary is based on your currently visible filtered shifts.
+      </div>
+    </section>
+
+    <section class="cabinet-grid">
+      <div class="drawer">
+        <div class="drawer-header">
+          <div>
+            <div class="drawer-title">Shift Entry Drawer</div>
+            <div class="drawer-sub">Add or edit a shift with section, multiple tags, notes, base pay, and tips.</div>
+          </div>
+        </div>
+        <div class="drawer-body">
+          <div class="input-grid">
+            <div class="field">
+              <label for="date">Date</label>
+              <input type="date" id="date" />
+            </div>
+
+            <div class="field">
+              <label for="section">Section</label>
+              <input type="text" id="section" placeholder="Patio, Bar, Main Dining" />
+            </div>
+
+            <div class="field">
+              <label for="hours">Hours Worked</label>
+              <input type="number" id="hours" step="0.01" min="0" placeholder="6.50" />
+            </div>
+
+            <div class="field">
+              <label for="tips">Tips Earned</label>
+              <input type="number" id="tips" step="0.01" min="0" placeholder="185.00" />
+            </div>
+
+            <div class="field">
+              <label for="basePay">Base Pay</label>
+              <input type="number" id="basePay" step="0.01" min="0" placeholder="0.00" />
+            </div>
+
+            <div class="field full">
+              <label>Shift Tags</label>
+              <div class="checkbox-grid" id="tagCheckboxes"></div>
+            </div>
+
+            <div class="field full">
+              <label for="notes">Notes</label>
+              <textarea id="notes" placeholder="Party of 20, storm rolled in, dead patio, double sat, manager cut people early..."></textarea>
+            </div>
+          </div>
+
+          <div class="button-row">
+            <button class="primary-btn" id="saveBtn" onclick="handleSubmit()">Save Shift</button>
+            <button class="secondary-btn" onclick="exportCSV()">Export CSV</button>
+            <button class="secondary-btn" onclick="triggerImportCSV()">Import CSV</button>
+            <button class="secondary-btn" onclick="exportJSON()">Export JSON</button>
+            <button class="warning-btn" onclick="resetForm()">Clear Form</button>
+          </div>
+
+          <input type="file" id="csvFileInput" class="hidden" accept=".csv,text/csv" />
+          <input type="file" id="jsonFileInput" class="hidden" accept=".json,application/json" />
+        </div>
+      </div>
+
+      <div class="cabinet">
+        <div class="cabinet-header">
+          <div>
+            <div class="cabinet-title">Performance Cabinet</div>
+            <div class="cabinet-sub">Headline metrics based on currently visible filtered data.</div>
+            <div class="week-range" id="weekRange">Week: --</div>
+          </div>
+        </div>
+        <div class="cabinet-body">
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Total Tips</div><div class="stat-value" id="totalTips">$0.00</div></div>
+            <div class="stat-card"><div class="stat-label">Total Base Pay</div><div class="stat-value" id="totalBase">$0.00</div></div>
+            <div class="stat-card"><div class="stat-label">Total Hours</div><div class="stat-value" id="totalHours">0.00</div></div>
+            <div class="stat-card"><div class="stat-label">Overall Avg / Hr</div><div class="stat-value" id="overallAvg">$0.00</div></div>
+            <div class="stat-card"><div class="stat-label">Weekly Avg (Fri–Thu)</div><div class="stat-value" id="weeklyAvg">$0.00</div></div>
+            <div class="stat-card"><div class="stat-label">Weekly Total Earnings</div><div class="stat-value" id="weeklyTotal">$0.00</div></div>
+            <div class="stat-card"><div class="stat-label">Monthly Total Earnings</div><div class="stat-value" id="monthlyTotal">$0.00</div></div>
+            <div class="stat-card"><div class="stat-label">Visible Shifts</div><div class="stat-value" id="visibleShifts">0</div></div>
+            <div class="stat-card wide"><div class="stat-label">Best Shift</div><div class="stat-value" id="bestShift">$0.00 / hr</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Filters Drawer</div>
+          <div class="muted-note">Filter by section, date, tags, and notes without touching the saved data.</div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="filter-grid">
+          <div class="field"><label for="filterSection">Filter by Section</label><select id="filterSection"></select></div>
+          <div class="field"><label for="filterStart">Start Date</label><input type="date" id="filterStart" /></div>
+          <div class="field"><label for="filterEnd">End Date</label><input type="date" id="filterEnd" /></div>
+          <div class="field"><label for="noteSearch">Search Notes</label><input type="text" id="noteSearch" placeholder="storm, party, cut, patio..." /></div>
+          <div class="field"><label for="filterTagMode">Tag Filter Mode</label><select id="filterTagMode"><option value="any">Match Any Selected Tag</option><option value="all">Match All Selected Tags</option></select></div>
+        </div>
+
+        <div class="field full" style="margin-top:12px;">
+          <label>Filter by Tags</label>
+          <div class="checkbox-grid" id="filterTagCheckboxes"></div>
+        </div>
+
+        <div class="button-row" style="margin-top:14px;">
+          <button class="secondary-btn" onclick="applyFilters()">Apply Filters</button>
+          <button class="warning-btn" onclick="clearFilters()">Clear Filters</button>
+          <button class="secondary-btn" onclick="setCurrentWeekFilter()">This Week</button>
+          <button class="secondary-btn" onclick="triggerImportJSON()">Import JSON</button>
+          <button class="danger-btn" onclick="clearAllData()">Delete All Data</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="lower-grid">
+      <div class="panel"><div class="panel-header"><div class="panel-title">Section Performance</div></div><div class="panel-body"><div class="mini-list" id="sectionStats"></div></div></div>
+      <div class="panel"><div class="panel-header"><div class="panel-title">Day-of-Week Performance</div></div><div class="panel-body"><div class="mini-list" id="dayStats"></div></div></div>
+    </section>
+
+    <section class="lower-grid">
+      <div class="panel"><div class="panel-header"><div class="panel-title">Tag Analytics</div></div><div class="panel-body"><div class="mini-list" id="tagStats"></div></div></div>
+      <div class="panel"><div class="panel-header"><div class="panel-title">Weekly History Drawer</div></div><div class="panel-body"><div id="weeklyHistory"></div></div></div>
+    </section>
+
+    <section class="lower-grid">
+      <div class="panel"><div class="panel-header"><div class="panel-title">Top 5 Shifts</div></div><div class="panel-body"><div class="mini-list" id="topShifts"></div></div></div>
+      <div class="panel"><div class="panel-header"><div class="panel-title">Bottom 5 Shifts</div></div><div class="panel-body"><div class="mini-list" id="bottomShifts"></div></div></div>
+    </section>
+
+    <section class="lower-grid">
+      <div class="panel"><div class="panel-header"><div class="panel-title">Best Tag Combinations</div></div><div class="panel-body"><div class="mini-list" id="tagComboStats"></div></div></div>
+      <div class="panel"><div class="panel-header"><div class="panel-title">Section + Tag Insights</div></div><div class="panel-body"><div class="mini-list" id="sectionTagStats"></div></div></div>
+    </section>
+
+    <section class="panel" style="margin-bottom:16px;">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Keyword Insights</div>
+          <div class="muted-note">Looks for useful note words like party, storm, cut, double sat, etc.</div>
+        </div>
+      </div>
+      <div class="panel-body"><div class="mini-list" id="keywordStats"></div></div>
+    </section>
+
+    <section class="panel" style="margin-bottom:16px;">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Recommendations Engine</div>
+          <div class="muted-note">Compares sections, tags, and note keywords against your visible baseline.</div>
+        </div>
+      </div>
+      <div class="panel-body"><div class="mini-list" id="recommendationStats"></div></div>
+    </section>
+
+    <section class="lower-grid" style="margin-bottom:16px;">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Baseline Comparison Cards</div></div>
+        <div class="panel-body"><div class="stats-grid" id="baselineCards"></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">Quick Takeaways</div></div>
+        <div class="panel-body"><div class="mini-list" id="quickTakeaways"></div></div>
+      </div>
+    </section>
+
+    <section class="charts-grid">
+      <div class="panel"><div class="panel-header"><div class="panel-title">Hourly Earnings by Shift</div></div><div class="panel-body"><div class="chart-wrap"><canvas id="hourlyTrendChart"></canvas></div></div></div>
+      <div class="panel"><div class="panel-header"><div class="panel-title">Section Avg / Hr</div></div><div class="panel-body"><div class="chart-wrap"><canvas id="sectionChart"></canvas></div></div></div>
+      <div class="panel"><div class="panel-header"><div class="panel-title">Weekly Total Earnings</div></div><div class="panel-body"><div class="chart-wrap"><canvas id="weeklyChart"></canvas></div></div></div>
+      <div class="panel"><div class="panel-header"><div class="panel-title">Monthly Total Earnings</div></div><div class="panel-body"><div class="chart-wrap"><canvas id="monthlyChart"></canvas></div></div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Shift Ledger</div>
+          <div class="muted-note">Notes and tags now live with each shift, which is where the juicy pattern-detection starts.</div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="summary-row">
+          <div class="summary-chip"><div class="label">Current Filter</div><div class="value" id="filterSummary">All shifts</div></div>
+          <div class="summary-chip"><div class="label">Visible Earnings</div><div class="value" id="visibleEarnings">$0.00</div></div>
+          <div class="summary-chip"><div class="label">Visible Avg / Hr</div><div class="value" id="visibleAvgHourly">$0.00</div></div>
+        </div>
+
+        <div class="table-shell" style="margin-top:14px;">
+          <table id="shiftTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Section</th>
+                <th>Hours</th>
+                <th>Tips</th>
+                <th>Base Pay</th>
+                <th>Total Earnings</th>
+                <th>$ / Hr</th>
+                <th>Tags</th>
+                <th>Notes</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "shiftDataV5_4";
+    const LEGACY_KEYS = ["shiftDataV5_3", "shiftDataV5_2", "shiftDataV5_1", "shiftDataV5", "shiftDataV4", "shiftDataV3", "shiftDataV2", "shiftData"];
+    const DAY_NAMES = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const TAG_OPTIONS = ["good","bad","slow","busy","raining","cloudy","cold","hot"];
+    const STOP_WORDS = new Set(["the","and","for","with","was","were","had","got","our","but","too","very","then","into","from","that","this","they","them","have","has","after","before","night","shift","table","tables","section","server","work"]);
+
+    let shifts = loadData();
+    let filteredShifts = [...shifts];
+    let editId = null;
+
+    let hourlyTrendChart = null;
+    let sectionChart = null;
+    let weeklyChart = null;
+    let monthlyChart = null;
+
+    function generateId(){ return `shift_${Date.now()}_${Math.random().toString(36).slice(2,10)}`; }
+    function sortByDateAsc(a,b){ return new Date(a.date) - new Date(b.date); }
+    function formatCurrency(value){ return `$${Number(value || 0).toFixed(2)}`; }
+    function formatNumber(value){ return Number(value || 0).toFixed(2); }
+    function escapeHtml(str){ return String(str ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+    function csvSafe(value){ return `"${String(value ?? "").replace(/"/g, '""')}"`; }
+
+    function normalizeSectionName(section){
+      const cleaned = String(section || "").trim().replace(/\s+/g, " ");
+      if(!cleaned) return "";
+      return cleaned.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
+    }
+
+    function normalizeTags(tags){
+      let list = [];
+      if(Array.isArray(tags)) list = tags;
+      else if(typeof tags === "string") list = tags.split("|");
+      return [...new Set(list.map(t => String(t).trim().toLowerCase()).filter(Boolean).filter(t => TAG_OPTIONS.includes(t)))];
+    }
+
+    function calculateHourly(totalEarnings, hours){ return hours > 0 ? totalEarnings / hours : 0; }
+
+    function normalizeShift(shift){
+      if(!shift) return null;
+      const id = String(shift.id || generateId());
+      const date = String(shift.date || "").trim();
+      const section = normalizeSectionName(shift.section);
+      const hours = Number(shift.hours || 0);
+      const tips = Number(shift.tips || 0);
+      const basePay = Number(shift.basePay || shift.basepay || 0);
+      const tags = normalizeTags(shift.tags || shift.tag || []);
+      const notes = String(shift.notes || "").trim();
+      if(!date || !section || !Number.isFinite(hours) || !Number.isFinite(tips) || !Number.isFinite(basePay) || hours <= 0 || tips < 0 || basePay < 0) return null;
+      const totalEarnings = tips + basePay;
+      const hourly = calculateHourly(totalEarnings, hours);
+      return { id, date, section, hours, tips, basePay, totalEarnings, hourly, tags, notes };
+    }
+
+    function loadData(){
+      let raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if(!raw){
+        for(const key of LEGACY_KEYS){
+          const legacy = JSON.parse(localStorage.getItem(key));
+          if(Array.isArray(legacy) && legacy.length){ raw = legacy; break; }
+        }
+      }
+      raw = Array.isArray(raw) ? raw : [];
+      const normalized = raw.map(normalizeShift).filter(Boolean).sort(sortByDateAsc);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(normalized));
+      return normalized;
+    }
+
+    function saveData(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(shifts)); }
+    function groupBy(data, keyFn){ return data.reduce((acc, item) => { const key = keyFn(item); if(!acc[key]) acc[key] = []; acc[key].push(item); return acc; }, {}); }
+    function aggregateTotals(data){ return data.reduce((acc, s) => { acc.hours += s.hours; acc.tips += s.tips; acc.basePay += s.basePay; acc.totalEarnings += s.totalEarnings; return acc; }, { hours:0, tips:0, basePay:0, totalEarnings:0 }); }
+    function withHourly(totals){ return { ...totals, avgHourly: calculateHourly(totals.totalEarnings, totals.hours) }; }
+    function buildAverageListFromGroups(groups, sortFn){ return Object.entries(groups).map(([name, items]) => { const totals = withHourly(aggregateTotals(items)); return { name, ...totals, shifts: items.length }; }).sort(sortFn); }
+
+    function toDateStringLocal(date){ const y = date.getFullYear(); const m = String(date.getMonth() + 1).padStart(2, "0"); const d = String(date.getDate()).padStart(2, "0"); return `${y}-${m}-${d}`; }
+    function formatShortDate(date){ return date.toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
+
+    function getFridayWeekRange(baseDate = new Date()){
+      const d = new Date(baseDate); d.setHours(0,0,0,0);
+      const day = d.getDay(); const diffToFriday = day >= 5 ? day - 5 : day + 2;
+      const start = new Date(d); start.setDate(d.getDate() - diffToFriday);
+      const end = new Date(start); end.setDate(start.getDate() + 6);
+      return { start, end };
+    }
+
+    function getWeekStartString(dateString){
+      const d = new Date(dateString + "T00:00:00");
+      const day = d.getDay(); const diffToFriday = day >= 5 ? day - 5 : day + 2;
+      d.setDate(d.getDate() - diffToFriday); return toDateStringLocal(d);
+    }
+
+    function getMonthKey(dateString){ return String(dateString).slice(0,7); }
+    function getCurrentWeekStats(data){ const { start, end } = getFridayWeekRange(new Date()); const startStr = toDateStringLocal(start); const endStr = toDateStringLocal(end); const weekShifts = data.filter(s => s.date >= startStr && s.date <= endStr); return { ...withHourly(aggregateTotals(weekShifts)), start, end }; }
+    function getCurrentMonthStats(data){ const now = new Date(); const monthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`; const monthShifts = data.filter(s => getMonthKey(s.date) === monthKey); return withHourly(aggregateTotals(monthShifts)); }
+
+    function renderTagCheckboxGroup(containerId, namePrefix){
+      const container = document.getElementById(containerId);
+      container.innerHTML = TAG_OPTIONS.map((tag, index) => {
+        const inputId = `${namePrefix}_${tag}_${index}`;
+        return `
+          <div class="check-pill">
+            <input id="${inputId}" type="checkbox" value="${tag}" data-group="${namePrefix}">
+            <label for="${inputId}">${tag.charAt(0).toUpperCase() + tag.slice(1)}</label>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function getCheckedTags(groupName){ return [...document.querySelectorAll(`input[data-group="${groupName}"]:checked`)].map(el => el.value); }
+    function setCheckedTags(groupName, tags){ const set = new Set(tags); document.querySelectorAll(`input[data-group="${groupName}"]`).forEach(el => { el.checked = set.has(el.value); }); }
+    function clearCheckedTags(groupName){ document.querySelectorAll(`input[data-group="${groupName}"]`).forEach(el => { el.checked = false; }); }
+
+    function getFormData(){
+      return normalizeShift({
+        id: editId || generateId(),
+        date: document.getElementById("date").value,
+        section: document.getElementById("section").value,
+        hours: document.getElementById("hours").value,
+        tips: document.getElementById("tips").value,
+        basePay: document.getElementById("basePay").value || 0,
+        tags: getCheckedTags("entryTags"),
+        notes: document.getElementById("notes").value
+      });
+    }
+
+    function findShiftIndexById(id){ return shifts.findIndex(s => s.id === id); }
+
+    function resetForm(){
+      ["date","section","hours","tips","basePay","notes"].forEach(id => { document.getElementById(id).value = ""; });
+      clearCheckedTags("entryTags");
+      editId = null;
+      document.getElementById("saveBtn").textContent = "Save Shift";
+    }
+
+    function handleSubmit(){
+      const shift = getFormData();
+      if(!shift){ alert("Please fill out date, section, hours, and earnings correctly."); return; }
+      if(editId === null) shifts.push(shift);
+      else {
+        const index = findShiftIndexById(editId);
+        if(index !== -1) shifts[index] = shift;
+        else shifts.push(shift);
+        editId = null;
+      }
+      shifts.sort(sortByDateAsc); saveData(); resetForm(); refreshAll();
+    }
+
+    function editShift(id){
+      const shift = shifts.find(s => s.id === id); if(!shift) return;
+      document.getElementById("date").value = shift.date;
+      document.getElementById("section").value = shift.section;
+      document.getElementById("hours").value = shift.hours;
+      document.getElementById("tips").value = shift.tips;
+      document.getElementById("basePay").value = shift.basePay;
+      document.getElementById("notes").value = shift.notes || "";
+      setCheckedTags("entryTags", shift.tags || []);
+      editId = shift.id;
+      document.getElementById("saveBtn").textContent = "Update Shift";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function deleteShift(id){
+      const index = findShiftIndexById(id); if(index === -1) return;
+      shifts.splice(index, 1); if(editId === id) resetForm(); saveData(); refreshAll();
+    }
+
+    function clearAllData(){ if(!confirm("Delete all saved shift data?")) return; shifts = []; filteredShifts = []; editId = null; saveData(); resetForm(); refreshAll(); }
+
+    function buildSelectOptions(selectId, values, defaultLabel){
+      const select = document.getElementById(selectId);
+      const currentValue = select.value;
+      const uniqueValues = [...new Set(values)].sort((a,b) => String(a).localeCompare(String(b)));
+      select.innerHTML = `<option value="">${defaultLabel}</option>` + uniqueValues.map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join("");
+      if(uniqueValues.includes(currentValue)) select.value = currentValue;
+    }
+
+    function populateFilterOptions(){ buildSelectOptions("filterSection", shifts.map(s => s.section), "All sections"); }
+
+    function getFilters(){
+      return {
+        section: document.getElementById("filterSection").value,
+        start: document.getElementById("filterStart").value,
+        end: document.getElementById("filterEnd").value,
+        tags: getCheckedTags("filterTags"),
+        tagMode: document.getElementById("filterTagMode").value,
+        noteSearch: document.getElementById("noteSearch").value.trim().toLowerCase()
+      };
+    }
+
+    function shiftMatchesTags(shiftTags, selectedTags, mode){
+      if(!selectedTags.length) return true;
+      if(mode === "all") return selectedTags.every(tag => shiftTags.includes(tag));
+      return selectedTags.some(tag => shiftTags.includes(tag));
+    }
+
+    function applyFilters(){
+      const { section, start, end, tags, tagMode, noteSearch } = getFilters();
+      filteredShifts = shifts.filter(s => {
+        const matchSection = !section || s.section === section;
+        const matchStart = !start || s.date >= start;
+        const matchEnd = !end || s.date <= end;
+        const matchTags = shiftMatchesTags(s.tags || [], tags, tagMode);
+        const matchNote = !noteSearch || (s.notes || "").toLowerCase().includes(noteSearch);
+        return matchSection && matchStart && matchEnd && matchTags && matchNote;
+      });
+      renderAll();
+    }
+
+    function clearFilters(){
+      document.getElementById("filterSection").value = "";
+      document.getElementById("filterStart").value = "";
+      document.getElementById("filterEnd").value = "";
+      document.getElementById("noteSearch").value = "";
+      document.getElementById("filterTagMode").value = "any";
+      clearCheckedTags("filterTags");
+      filteredShifts = [...shifts];
+      renderAll();
+    }
+
+    function setCurrentWeekFilter(){
+      const { start, end } = getFridayWeekRange(new Date());
+      document.getElementById("filterStart").value = toDateStringLocal(start);
+      document.getElementById("filterEnd").value = toDateStringLocal(end);
+      applyFilters();
+    }
+
+    function updateHeaderStats(){
+      const totals = withHourly(aggregateTotals(filteredShifts));
+      const weekly = getCurrentWeekStats(shifts);
+      const monthly = getCurrentMonthStats(shifts);
+      const best = filteredShifts.length ? filteredShifts.reduce((bestSoFar, s) => s.hourly > bestSoFar.hourly ? s : bestSoFar, filteredShifts[0]) : null;
+      document.getElementById("totalTips").textContent = formatCurrency(totals.tips);
+      document.getElementById("totalBase").textContent = formatCurrency(totals.basePay);
+      document.getElementById("totalHours").textContent = formatNumber(totals.hours);
+      document.getElementById("overallAvg").textContent = formatCurrency(totals.avgHourly);
+      document.getElementById("weeklyAvg").textContent = formatCurrency(weekly.avgHourly);
+      document.getElementById("weeklyTotal").textContent = formatCurrency(weekly.totalEarnings);
+      document.getElementById("monthlyTotal").textContent = formatCurrency(monthly.totalEarnings);
+      document.getElementById("visibleShifts").textContent = String(filteredShifts.length);
+      document.getElementById("weekRange").textContent = `Week: ${formatShortDate(weekly.start)} – ${formatShortDate(weekly.end)}`;
+      document.getElementById("bestShift").textContent = best ? `${formatCurrency(best.hourly)} / hr · ${best.date} · ${best.section}` : "$0.00 / hr";
+    }
+
+    function updateFilterSummary(){
+      const filters = getFilters();
+      const parts = [];
+      if(filters.section) parts.push(`Section: ${filters.section}`);
+      if(filters.start) parts.push(`From: ${filters.start}`);
+      if(filters.end) parts.push(`To: ${filters.end}`);
+      if(filters.tags.length) parts.push(`Tags: ${filters.tags.join(", ")}`);
+      if(filters.noteSearch) parts.push(`Notes: ${filters.noteSearch}`);
+      const totals = withHourly(aggregateTotals(filteredShifts));
+      document.getElementById("filterSummary").textContent = parts.length ? parts.join(" · ") : "All shifts";
+      document.getElementById("visibleEarnings").textContent = formatCurrency(totals.totalEarnings);
+      document.getElementById("visibleAvgHourly").textContent = formatCurrency(totals.avgHourly);
+    }
+
+    function renderMiniStatList(containerId, items, emptyText, formatter){
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+      if(!items.length){ container.innerHTML = `<div class="empty-state">${escapeHtml(emptyText)}</div>`; return; }
+      items.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "mini-item";
+        div.innerHTML = `<div class="name">${escapeHtml(item.name)}</div><div class="value">${formatter(item)}</div>`;
+        container.appendChild(div);
+      });
+    }
+
+    function renderSectionStats(){ const grouped = groupBy(filteredShifts, s => s.section); const items = buildAverageListFromGroups(grouped, (a,b) => b.avgHourly - a.avgHourly); renderMiniStatList("sectionStats", items, "No section data yet.", item => `${formatCurrency(item.avgHourly)} / hr`); }
+    function renderDayStats(){ const grouped = groupBy(filteredShifts, s => DAY_NAMES[new Date(s.date + "T00:00:00").getDay()]); const items = buildAverageListFromGroups(grouped, (a,b) => DAY_NAMES.indexOf(a.name) - DAY_NAMES.indexOf(b.name)); renderMiniStatList("dayStats", items, "No day-of-week data yet.", item => `${formatCurrency(item.avgHourly)} / hr`); }
+
+    function renderTagStats(){
+      const map = {};
+      filteredShifts.forEach(shift => { (shift.tags || []).forEach(tag => { if(!map[tag]) map[tag] = []; map[tag].push(shift); }); });
+      const items = buildAverageListFromGroups(map, (a,b) => b.avgHourly - a.avgHourly).filter(item => item.shifts >= 1);
+      renderMiniStatList("tagStats", items, "No tag data yet.", item => `${formatCurrency(item.avgHourly)} / hr`);
+    }
+
+    function renderTopBottomShifts(){
+      const sorted = [...filteredShifts].sort((a,b) => b.hourly - a.hourly);
+      const top = sorted.slice(0,5).map(s => ({ name: `${s.date} · ${s.section}`, value: `${formatCurrency(s.hourly)} / hr` }));
+      const bottom = [...sorted].reverse().slice(0,5).map(s => ({ name: `${s.date} · ${s.section}`, value: `${formatCurrency(s.hourly)} / hr` }));
+      renderMiniStatList("topShifts", top, "No shifts yet.", item => item.value);
+      renderMiniStatList("bottomShifts", bottom, "No shifts yet.", item => item.value);
+    }
+
+    function renderWeeklyHistory(){
+      const container = document.getElementById("weeklyHistory");
+      container.innerHTML = "";
+      if(!shifts.length){ container.innerHTML = `<div class="empty-state">No weekly history yet.</div>`; return; }
+      const weeks = groupBy(shifts, s => getWeekStartString(s.date));
+      const weekKeys = Object.keys(weeks).sort((a,b) => new Date(b) - new Date(a));
+      weekKeys.forEach(weekStart => {
+        const weekItems = weeks[weekStart].sort(sortByDateAsc);
+        const startDate = new Date(weekStart + "T00:00:00");
+        const endDate = new Date(startDate); endDate.setDate(endDate.getDate() + 6);
+        const totals = withHourly(aggregateTotals(weekItems));
+        const detail = document.createElement("details");
+        detail.className = "week-card";
+        detail.innerHTML = `
+          <summary><span>${formatShortDate(startDate)} – ${formatShortDate(endDate)} · ${weekItems.length} shift${weekItems.length === 1 ? "" : "s"}</span><span class="week-meta">${formatCurrency(totals.avgHourly)} / hr</span></summary>
+          <div class="week-body">
+            <div class="summary-row">
+              <div class="summary-chip"><div class="label">Tips</div><div class="value">${formatCurrency(totals.tips)}</div></div>
+              <div class="summary-chip"><div class="label">Base Pay</div><div class="value">${formatCurrency(totals.basePay)}</div></div>
+              <div class="summary-chip"><div class="label">Total Earnings</div><div class="value">${formatCurrency(totals.totalEarnings)}</div></div>
+            </div>
+            <div style="margin-top:12px;" class="muted-note">${weekItems.map(s => `${s.date} · ${escapeHtml(s.section)} · ${formatCurrency(s.hourly)}/hr · ${(s.tags || []).join(", ") || "no tags"}`).join("<br>")}</div>
+          </div>
+        `;
+        container.appendChild(detail);
+      });
+    }
+
+    function getTagCombosForShift(tags){
+      const clean = [...new Set((tags || []).filter(Boolean))]; if (!clean.length) return [];
+      const combos = []; clean.forEach(tag => combos.push(tag));
+      for (let i = 0; i < clean.length; i++) for (let j = i + 1; j < clean.length; j++) combos.push([clean[i], clean[j]].sort().join(" + "));
+      return combos;
+    }
+
+    function tokenizeNotes(text){ return String(text || "").toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).map(t => t.trim()).filter(Boolean); }
+
+    function buildInsightListFromShiftBuckets(bucketMap, minShifts = 2){
+      return Object.entries(bucketMap).map(([name, items]) => {
+        const totals = withHourly(aggregateTotals(items));
+        return { name, shifts: items.length, avgHourly: totals.avgHourly, totalEarnings: totals.totalEarnings };
+      }).filter(item => item.shifts >= minShifts).sort((a, b) => b.avgHourly - a.avgHourly);
+    }
+
+    function getKeywordBucketsFromShifts(data){
+      const keywordBuckets = {};
+      data.forEach(shift => {
+        const tokens = [...new Set(tokenizeNotes(shift.notes))];
+        tokens.forEach(token => {
+          if (token.length < 4) return;
+          if (STOP_WORDS.has(token)) return;
+          if (!keywordBuckets[token]) keywordBuckets[token] = [];
+          keywordBuckets[token].push(shift);
+        });
+      });
+      return keywordBuckets;
+    }
+
+    function renderTagComboStats(){
+      const buckets = {};
+      filteredShifts.forEach(shift => { getTagCombosForShift(shift.tags || []).forEach(combo => { if (!buckets[combo]) buckets[combo] = []; buckets[combo].push(shift); }); });
+      const items = buildInsightListFromShiftBuckets(buckets, 2).slice(0, 8);
+      renderMiniStatList("tagComboStats", items, "Not enough tag combination data yet.", item => `${formatCurrency(item.avgHourly)} / hr · ${item.shifts} shifts`);
+    }
+
+    function renderSectionTagStats(){
+      const buckets = {};
+      filteredShifts.forEach(shift => { (shift.tags || []).forEach(tag => { const key = `${shift.section} + ${tag}`; if (!buckets[key]) buckets[key] = []; buckets[key].push(shift); }); });
+      const items = buildInsightListFromShiftBuckets(buckets, 2).slice(0, 8);
+      renderMiniStatList("sectionTagStats", items, "Not enough section/tag data yet.", item => `${formatCurrency(item.avgHourly)} / hr · ${item.shifts} shifts`);
+    }
+
+    function renderKeywordStats(){
+      const buckets = getKeywordBucketsFromShifts(filteredShifts);
+      const items = buildInsightListFromShiftBuckets(buckets, 2).slice(0, 10);
+      renderMiniStatList("keywordStats", items, "Add more notes to unlock keyword insights.", item => `${formatCurrency(item.avgHourly)} / hr · ${item.shifts} shifts`);
+    }
+
+    function getConfidenceLabel(shiftsCount){ if (shiftsCount >= 8) return "high confidence"; if (shiftsCount >= 4) return "medium confidence"; return "low confidence"; }
+    function buildDeltaLabel(avgHourly, baseline){ const delta = avgHourly - baseline; const sign = delta >= 0 ? "+" : ""; return `${sign}${formatCurrency(delta)} / hr vs baseline`; }
+    function makeRecommendationItem(name, avgHourly, shifts, baseline, direction){ return { name, avgHourly, shifts, delta: avgHourly - baseline, direction }; }
+
+    function renderRecommendations(){
+      const baselineTotals = withHourly(aggregateTotals(filteredShifts));
+      const baseline = baselineTotals.avgHourly;
+      const containerId = "recommendationStats";
+      if (!filteredShifts.length || baselineTotals.hours <= 0) { renderMiniStatList(containerId, [], "Add more shifts to generate recommendations.", () => ""); return; }
+
+      const recommendations = [];
+      const sectionGroups = groupBy(filteredShifts, s => s.section);
+      buildAverageListFromGroups(sectionGroups, (a,b) => b.avgHourly - a.avgHourly).filter(item => item.shifts >= 2).forEach(item => {
+        recommendations.push(makeRecommendationItem(`Section: ${item.name}`, item.avgHourly, item.shifts, baseline, item.avgHourly >= baseline ? "up" : "down"));
+      });
+
+      const tagBuckets = {};
+      filteredShifts.forEach(shift => { (shift.tags || []).forEach(tag => { if (!tagBuckets[tag]) tagBuckets[tag] = []; tagBuckets[tag].push(shift); }); });
+      buildInsightListFromShiftBuckets(tagBuckets, 2).forEach(item => {
+        recommendations.push(makeRecommendationItem(`Tag: ${item.name}`, item.avgHourly, item.shifts, baseline, item.avgHourly >= baseline ? "up" : "down"));
+      });
+
+      buildInsightListFromShiftBuckets(getKeywordBucketsFromShifts(filteredShifts), 2).forEach(item => {
+        recommendations.push(makeRecommendationItem(`Keyword: ${item.name}`, item.avgHourly, item.shifts, baseline, item.avgHourly >= baseline ? "up" : "down"));
+      });
+
+      const strongest = recommendations.filter(item => Math.abs(item.delta) >= 1).sort((a,b) => Math.abs(b.delta) - Math.abs(a.delta)).slice(0, 10).map(item => ({ ...item, confidence: getConfidenceLabel(item.shifts) }));
+      renderMiniStatList(containerId, strongest, "Not enough pattern strength yet. More shifts or richer notes will wake it up.", item => `${buildDeltaLabel(item.avgHourly, baseline)} · ${item.shifts} shifts · ${item.confidence}`);
+    }
+
+    function buildCardHtml(label, value, subtext){ return `<div class="stat-card"><div class="stat-label">${escapeHtml(label)}</div><div class="stat-value">${value}</div><div class="muted-note" style="margin-top:8px;">${escapeHtml(subtext)}</div></div>`; }
+
+    function getBestAndWorst(items){ if (!items.length) return { best: null, worst: null }; const sorted = [...items].sort((a, b) => b.avgHourly - a.avgHourly); return { best: sorted[0] || null, worst: sorted[sorted.length - 1] || null }; }
+    function formatDeltaText(item, baseline){ const delta = item.avgHourly - baseline; const sign = delta >= 0 ? "+" : ""; return `${sign}${formatCurrency(delta)} / hr vs baseline`; }
+
+    function renderBaselineCards(){
+      const baselineContainer = document.getElementById("baselineCards");
+      const takeawayContainerId = "quickTakeaways";
+      baselineContainer.innerHTML = "";
+      const baselineTotals = withHourly(aggregateTotals(filteredShifts));
+      const baseline = baselineTotals.avgHourly;
+      if (!filteredShifts.length || baselineTotals.hours <= 0) {
+        baselineContainer.innerHTML = `<div class="empty-state">Add more shifts to unlock baseline comparison cards.</div>`;
+        renderMiniStatList(takeawayContainerId, [], "No quick takeaways yet.", () => "");
+        return;
+      }
+
+      const sectionItems = buildAverageListFromGroups(groupBy(filteredShifts, s => s.section), (a, b) => b.avgHourly - a.avgHourly).filter(item => item.shifts >= 2);
+      const tagBuckets = {};
+      filteredShifts.forEach(shift => { (shift.tags || []).forEach(tag => { if (!tagBuckets[tag]) tagBuckets[tag] = []; tagBuckets[tag].push(shift); }); });
+      const tagItems = buildInsightListFromShiftBuckets(tagBuckets, 2);
+      const keywordItems = buildInsightListFromShiftBuckets(getKeywordBucketsFromShifts(filteredShifts), 2);
+      const { best: bestSection, worst: worstSection } = getBestAndWorst(sectionItems);
+      const { best: bestTag, worst: worstTag } = getBestAndWorst(tagItems);
+      const { best: bestKeyword } = getBestAndWorst(keywordItems);
+
+      const cards = [];
+      if (bestSection) cards.push(buildCardHtml("Best Section", escapeHtml(bestSection.name), `${formatDeltaText(bestSection, baseline)} · ${bestSection.shifts} shifts · ${getConfidenceLabel(bestSection.shifts)}`));
+      if (worstSection) cards.push(buildCardHtml("Worst Section", escapeHtml(worstSection.name), `${formatDeltaText(worstSection, baseline)} · ${worstSection.shifts} shifts · ${getConfidenceLabel(worstSection.shifts)}`));
+      if (bestTag) cards.push(buildCardHtml("Best Tag", escapeHtml(bestTag.name), `${formatDeltaText(bestTag, baseline)} · ${bestTag.shifts} shifts · ${getConfidenceLabel(bestTag.shifts)}`));
+      if (worstTag) cards.push(buildCardHtml("Worst Tag", escapeHtml(worstTag.name), `${formatDeltaText(worstTag, baseline)} · ${worstTag.shifts} shifts · ${getConfidenceLabel(worstTag.shifts)}`));
+      if (bestKeyword) cards.push(buildCardHtml("Best Keyword", escapeHtml(bestKeyword.name), `${formatDeltaText(bestKeyword, baseline)} · ${bestKeyword.shifts} shifts · ${getConfidenceLabel(bestKeyword.shifts)}`));
+      baselineContainer.innerHTML = cards.length ? cards.join("") : `<div class="empty-state">Not enough repeated patterns yet for baseline cards.</div>`;
+
+      const takeaways = [];
+      if (bestSection) takeaways.push({ name: `Lean toward ${bestSection.name}`, value: `${formatDeltaText(bestSection, baseline)} · ${getConfidenceLabel(bestSection.shifts)}` });
+      if (worstSection) takeaways.push({ name: `Watch ${worstSection.name}`, value: `${formatDeltaText(worstSection, baseline)} · ${getConfidenceLabel(worstSection.shifts)}` });
+      if (bestTag) takeaways.push({ name: `Tag signal: ${bestTag.name}`, value: `${formatDeltaText(bestTag, baseline)} · ${getConfidenceLabel(bestTag.shifts)}` });
+      if (worstTag) takeaways.push({ name: `Weak tag: ${worstTag.name}`, value: `${formatDeltaText(worstTag, baseline)} · ${getConfidenceLabel(worstTag.shifts)}` });
+      if (bestKeyword) takeaways.push({ name: `Notes hint: "${bestKeyword.name}"`, value: `${formatDeltaText(bestKeyword, baseline)} · ${getConfidenceLabel(bestKeyword.shifts)}` });
+      renderMiniStatList(takeawayContainerId, takeaways, "No quick takeaways yet.", item => item.value);
+    }
+
+    function buildExecutiveSummary(){
+      const summaryTextEl = document.getElementById("executiveSummaryText");
+      const summarySubEl = document.getElementById("executiveSummarySub");
+      const baselineTotals = withHourly(aggregateTotals(filteredShifts));
+      if (!filteredShifts.length || baselineTotals.hours <= 0) {
+        summaryTextEl.textContent = "Add a few shifts and this panel will start translating the numbers into plain-English takeaways.";
+        summarySubEl.textContent = "Summary is based on your currently visible filtered shifts.";
+        return;
+      }
+
+      const baseline = baselineTotals.avgHourly;
+      const sectionItems = buildAverageListFromGroups(groupBy(filteredShifts, s => s.section), (a, b) => b.avgHourly - a.avgHourly).filter(item => item.shifts >= 2);
+      const tagBuckets = {};
+      filteredShifts.forEach(shift => { (shift.tags || []).forEach(tag => { if (!tagBuckets[tag]) tagBuckets[tag] = []; tagBuckets[tag].push(shift); }); });
+      const tagItems = buildInsightListFromShiftBuckets(tagBuckets, 2);
+      const keywordItems = buildInsightListFromShiftBuckets(getKeywordBucketsFromShifts(filteredShifts), 2);
+      const { best: bestSection, worst: worstSection } = getBestAndWorst(sectionItems);
+      const { best: bestTag, worst: worstTag } = getBestAndWorst(tagItems);
+      const { best: bestKeyword } = getBestAndWorst(keywordItems);
+
+      const lines = [];
+      if (bestSection) lines.push(`${bestSection.name} is your strongest section right now at ${formatCurrency(bestSection.avgHourly)} per hour, which is ${formatDeltaText(bestSection, baseline)}.`);
+      if (worstSection && worstSection.name !== bestSection?.name) lines.push(`${worstSection.name} is lagging your baseline at ${formatCurrency(worstSection.avgHourly)} per hour.`);
+      if (bestTag) lines.push(`Among repeated conditions, the tag "${bestTag.name}" is the healthiest signal with ${getConfidenceLabel(bestTag.shifts)} based on ${bestTag.shifts} shifts.`);
+      if (worstTag) lines.push(`The weakest repeated tag signal is "${worstTag.name}", which looks soft relative to your visible average.`);
+      if (bestKeyword) lines.push(`In your notes, "${bestKeyword.name}" is the strongest keyword pattern so far.`);
+      const topShift = filteredShifts.length ? [...filteredShifts].sort((a,b) => b.hourly - a.hourly)[0] : null;
+      if (topShift) lines.push(`Your top visible shift is ${topShift.date} in ${topShift.section} at ${formatCurrency(topShift.hourly)} per hour.`);
+
+      summaryTextEl.textContent = lines.join(" ");
+      summarySubEl.textContent = `Visible baseline: ${formatCurrency(baseline)} / hr across ${filteredShifts.length} shift${filteredShifts.length === 1 ? "" : "s"}.`;
+    }
+
+    function renderTable(){
+      const tbody = document.querySelector("#shiftTable tbody");
+      tbody.innerHTML = "";
+      if(!filteredShifts.length){ tbody.innerHTML = `<tr><td colspan="10" class="muted-note">No shifts match the current filters.</td></tr>`; return; }
+      filteredShifts.forEach(shift => {
+        const tagsHtml = (shift.tags || []).length ? `<div class="tag-wrap">${shift.tags.map(tag => `<span class="tag-pill">${escapeHtml(tag)}</span>`).join("")}</div>` : `<span class="muted-note">None</span>`;
+        const notesHtml = shift.notes ? escapeHtml(shift.notes) : `<span class="muted-note">—</span>`;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${shift.date}</td>
+          <td>${escapeHtml(shift.section)}</td>
+          <td>${formatNumber(shift.hours)}</td>
+          <td>${formatCurrency(shift.tips)}</td>
+          <td>${formatCurrency(shift.basePay)}</td>
+          <td>${formatCurrency(shift.totalEarnings)}</td>
+          <td>${formatCurrency(shift.hourly)}</td>
+          <td>${tagsHtml}</td>
+          <td class="note-cell">${notesHtml}</td>
+          <td class="action-cell">
+            <button type="button" class="table-btn edit-btn" data-action="edit" data-id="${shift.id}">Edit</button>
+            <button type="button" class="table-btn delete-btn" data-action="delete" data-id="${shift.id}">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    document.addEventListener("click", (event) => {
+      const actionEl = event.target.closest("[data-action][data-id]");
+      if (!actionEl) return;
+      const { action, id } = actionEl.dataset;
+      if (action === "edit") editShift(id);
+      if (action === "delete") deleteShift(id);
+    });
+
+    function getChartOptions(){
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: "#dcebea" } } },
+        scales: {
+          x: { ticks: { color: "#9bb8b6" }, grid: { color: "rgba(255,255,255,.05)" } },
+          y: { beginAtZero: true, ticks: { color: "#9bb8b6", callback: value => "$" + value }, grid: { color: "rgba(255,255,255,.05)" } }
+        }
+      };
+    }
+
+    function getEmptyChartConfig(label){
+      return { labels: ["No data"], datasets: [{ label, data: [0], backgroundColor: "rgba(37, 219, 200, 0.18)", borderColor: "#25dbc8", borderWidth: 1.5, borderRadius: 8 }] };
+    }
+
+    function renderHourlyTrendChart(){
+      const ctx = document.getElementById("hourlyTrendChart").getContext("2d");
+      if(hourlyTrendChart) hourlyTrendChart.destroy();
+      const hasData = filteredShifts.length > 0;
+      hourlyTrendChart = new Chart(ctx, {
+        type: "line",
+        data: hasData ? {
+          labels: filteredShifts.map(s => s.date),
+          datasets: [{ label: "Hourly Earnings", data: filteredShifts.map(s => Number(s.hourly.toFixed(2))), borderColor: "#25dbc8", backgroundColor: "rgba(37, 219, 200, 0.18)", fill: true, tension: 0.28, borderWidth: 2, pointRadius: 3, pointHoverRadius: 5 }]
+        } : {
+          labels: ["No data"],
+          datasets: [{ label: "Hourly Earnings", data: [0], borderColor: "#25dbc8", backgroundColor: "rgba(37, 219, 200, 0.18)", fill: true, tension: 0.28, borderWidth: 2, pointRadius: 0, pointHoverRadius: 0 }]
+        },
+        options: getChartOptions()
+      });
+    }
+
+    function renderSectionChart(){
+      const ctx = document.getElementById("sectionChart").getContext("2d");
+      if(sectionChart) sectionChart.destroy();
+      const grouped = groupBy(filteredShifts, s => s.section);
+      const items = buildAverageListFromGroups(grouped, (a,b) => b.avgHourly - a.avgHourly);
+      sectionChart = new Chart(ctx, { type: "bar", data: items.length ? { labels: items.map(i => i.name), datasets: [{ label: "Section Avg / Hr", data: items.map(i => Number(i.avgHourly.toFixed(2))), backgroundColor: "rgba(37, 219, 200, 0.55)", borderColor: "#25dbc8", borderWidth: 1.5, borderRadius: 8 }] } : getEmptyChartConfig("Section Avg / Hr"), options: getChartOptions() });
+    }
+
+    function renderWeeklyChart(){
+      const ctx = document.getElementById("weeklyChart").getContext("2d");
+      if(weeklyChart) weeklyChart.destroy();
+      const grouped = groupBy(filteredShifts, s => getWeekStartString(s.date));
+      const items = Object.entries(grouped).map(([weekStart, weekItems]) => {
+        const totals = aggregateTotals(weekItems);
+        const startDate = new Date(weekStart + "T00:00:00");
+        const endDate = new Date(startDate); endDate.setDate(endDate.getDate() + 6);
+        return { label: `${formatShortDate(startDate)}–${formatShortDate(endDate)}`, totalEarnings: Number(totals.totalEarnings.toFixed(2)), weekStart };
+      }).sort((a,b) => new Date(a.weekStart) - new Date(b.weekStart));
+      weeklyChart = new Chart(ctx, { type: "bar", data: items.length ? { labels: items.map(i => i.label), datasets: [{ label: "Weekly Total Earnings", data: items.map(i => i.totalEarnings), backgroundColor: "rgba(37, 219, 200, 0.55)", borderColor: "#25dbc8", borderWidth: 1.5, borderRadius: 8 }] } : getEmptyChartConfig("Weekly Total Earnings"), options: getChartOptions() });
+    }
+
+    function renderMonthlyChart(){
+      const ctx = document.getElementById("monthlyChart").getContext("2d");
+      if(monthlyChart) monthlyChart.destroy();
+      const grouped = groupBy(filteredShifts, s => getMonthKey(s.date));
+      const items = Object.entries(grouped).map(([monthKey, monthItems]) => ({ label: monthKey, totalEarnings: Number(aggregateTotals(monthItems).totalEarnings.toFixed(2)) })).sort((a,b) => a.label.localeCompare(b.label));
+      monthlyChart = new Chart(ctx, { type: "bar", data: items.length ? { labels: items.map(i => i.label), datasets: [{ label: "Monthly Total Earnings", data: items.map(i => i.totalEarnings), backgroundColor: "rgba(37, 219, 200, 0.55)", borderColor: "#25dbc8", borderWidth: 1.5, borderRadius: 8 }] } : getEmptyChartConfig("Monthly Total Earnings"), options: getChartOptions() });
+    }
+
+    function renderCharts(){ renderHourlyTrendChart(); renderSectionChart(); renderWeeklyChart(); renderMonthlyChart(); }
+
+    function exportCSV(){
+      const header = ["ID","Date","Section","Hours","Tips","BasePay","TotalEarnings","Hourly","Tags","Notes"].join(",") + "\n";
+      const rows = shifts.map(s => [csvSafe(s.id), csvSafe(s.date), csvSafe(s.section), csvSafe(s.hours), csvSafe(s.tips), csvSafe(s.basePay), csvSafe(s.totalEarnings), csvSafe(Number(s.hourly).toFixed(2)), csvSafe((s.tags || []).join("|")), csvSafe(s.notes || "")].join(","));
+      const csv = header + rows.join("\n");
+      const blob = new Blob([csv], { type: "text/csv" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = "shift-data.csv"; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+
+    function exportJSON(){
+      const blob = new Blob([JSON.stringify(shifts, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a"); a.href = url; a.download = "shift-data.json"; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
+
+    function triggerImportCSV(){ document.getElementById("csvFileInput").click(); }
+    function triggerImportJSON(){ document.getElementById("jsonFileInput").click(); }
+
+    function parseCSVLine(line){
+      const result = []; let current = ""; let inQuotes = false;
+      for(let i = 0; i < line.length; i++){
+        const char = line[i]; const next = line[i + 1];
+        if(char === '"' && inQuotes && next === '"'){ current += '"'; i++; }
+        else if(char === '"'){ inQuotes = !inQuotes; }
+        else if(char === "," && !inQuotes){ result.push(current); current = ""; }
+        else { current += char; }
+      }
+      result.push(current); return result;
+    }
+
+    function mergeImportedShifts(imported){
+      const existingIds = new Set(shifts.map(s => s.id));
+      const clean = imported.map(s => { if(existingIds.has(s.id)) return { ...s, id: generateId() }; existingIds.add(s.id); return s; });
+      shifts = [...shifts, ...clean].sort(sortByDateAsc); saveData(); refreshAll(); alert(`Imported ${clean.length} shift(s).`);
+    }
+
+    function importCSVText(text){
+      const lines = text.split(/\r?\n/).filter(line => line.trim());
+      if(lines.length < 2){ alert("CSV file appears empty."); return; }
+      const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase());
+      const rows = lines.slice(1);
+      const imported = rows.map(line => {
+        const cells = parseCSVLine(line); const row = {}; headers.forEach((header, idx) => row[header] = cells[idx]);
+        return normalizeShift({ id: row.id || generateId(), date: row.date, section: row.section, hours: row.hours, tips: row.tips, basePay: row.basepay || row.base_pay || 0, tags: row.tags || row.tag || "", notes: row.notes || "" });
+      }).filter(Boolean);
+      if(!imported.length){ alert("No valid rows were found in the CSV."); return; }
+      mergeImportedShifts(imported);
+    }
+
+    function importJSONText(text){
+      let parsed; try { parsed = JSON.parse(text); } catch { alert("Invalid JSON file."); return; }
+      if(!Array.isArray(parsed)){ alert("JSON must contain an array of shifts."); return; }
+      const imported = parsed.map(normalizeShift).filter(Boolean);
+      if(!imported.length){ alert("No valid rows were found in the JSON."); return; }
+      mergeImportedShifts(imported);
+    }
+
+    document.getElementById("csvFileInput").addEventListener("change", event => {
+      const file = event.target.files[0]; if(!file) return;
+      const reader = new FileReader(); reader.onload = e => importCSVText(e.target.result); reader.readAsText(file); event.target.value = "";
+    });
+
+    document.getElementById("jsonFileInput").addEventListener("change", event => {
+      const file = event.target.files[0]; if(!file) return;
+      const reader = new FileReader(); reader.onload = e => importJSONText(e.target.result); reader.readAsText(file); event.target.value = "";
+    });
+
+    function renderAll(){
+      updateHeaderStats(); updateFilterSummary(); renderSectionStats(); renderDayStats(); renderTagStats(); renderWeeklyHistory(); renderTopBottomShifts(); renderTagComboStats(); renderSectionTagStats(); renderKeywordStats(); renderRecommendations(); renderBaselineCards(); buildExecutiveSummary(); renderTable(); renderCharts();
+    }
+
+    function refreshAll(){ populateFilterOptions(); applyFilters(); }
+
+    renderTagCheckboxGroup("tagCheckboxes", "entryTags");
+    renderTagCheckboxGroup("filterTagCheckboxes", "filterTags");
+    populateFilterOptions();
+    filteredShifts = [...shifts];
+    renderAll();
+  </script>
+</body>
+</html>
