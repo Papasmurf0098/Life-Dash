@@ -77,9 +77,7 @@ export default function BulletinPage() {
     <div className="feature-page bulletin-page">
       <section className="feature-hero feature-hero--magenta">
         <div>
-          <p className="kicker">Bulletin</p>
-          <h1>Unload it. Rank it. Surface what matters.</h1>
-          <p>One fast place for priorities, due dates, and the thoughts you cannot afford to lose.</p>
+          <h1>Bulletin</h1>
         </div>
         <div className="hero-orbit" aria-hidden="true"><span /><span /><span /></div>
       </section>
@@ -93,7 +91,7 @@ export default function BulletinPage() {
 
       <section className="glass-panel capture-panel" id="bulletin-capture">
         <div className="section-title-row">
-          <div><p className="kicker">Quick capture</p><h2>Get it out of your head</h2></div>
+          <div><h2>Add item</h2></div>
         </div>
         <form
           className="smart-form"
@@ -116,8 +114,8 @@ export default function BulletinPage() {
             setPriority('critical')
           }}
         >
-          <label className="field field--wide"><span>Title</span><input name="title" required placeholder="What needs your attention?" /></label>
-          <label className="field field--wide"><span>Notes <em>optional</em></span><textarea name="notes" placeholder="Context, next action, or a reminder to yourself" /></label>
+          <label className="field field--wide"><span>Title</span><input name="title" required placeholder="Item title" /></label>
+          <label className="field field--wide"><span>Notes <em>optional</em></span><textarea name="notes" placeholder="Notes" /></label>
           <fieldset className="chip-field field--wide">
             <legend>Priority</legend>
             <div className="chip-row">
@@ -128,7 +126,7 @@ export default function BulletinPage() {
           </fieldset>
           <label className="field"><span>Due date <em>optional</em></span><input name="dueDate" type="date" /></label>
           <label className="field"><span>Due time <em>optional</em></span><input name="dueTime" type="time" /></label>
-          <button className="primary-action" type="submit">Add thought</button>
+          <button className="primary-action" type="submit">Add item</button>
         </form>
       </section>
 
@@ -139,7 +137,7 @@ export default function BulletinPage() {
               <button key={mode} type="button" className={view === mode ? 'is-active' : ''} onClick={() => setView(mode)}>{mode === 'bulletin' ? 'Priority' : mode[0].toUpperCase() + mode.slice(1)}</button>
             ))}
           </div>
-          <label className="search-field"><span className="sr-only">Search bulletin</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search thoughts" /></label>
+          <label className="search-field"><span className="sr-only">Search bulletin</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search items" /></label>
           <div className="toolbar-actions">
             <button className="text-action" type="button" onClick={() => downloadJson('life-dash-bulletin.json', items)}>Export</button>
             <button className="text-action" type="button" onClick={() => importRef.current?.click()}>Import</button>
@@ -184,7 +182,7 @@ export default function BulletinPage() {
               </div>
             </article>
           ))}
-          {!visible.length ? <div className="empty-state"><strong>Clear space.</strong><span>No items match this view.</span></div> : null}
+          {!visible.length ? <div className="empty-state"><strong>No items</strong></div> : null}
         </div>
       </section>
 
@@ -207,7 +205,7 @@ export default function BulletinPage() {
               setEditing(null)
             }}
           >
-            <div className="section-title-row"><div><p className="kicker">Edit thought</p><h2>Refine what matters</h2></div><button className="icon-action" type="button" onClick={() => setEditing(null)}>Close</button></div>
+            <div className="section-title-row"><div><h2>Edit item</h2></div><button className="icon-action" type="button" onClick={() => setEditing(null)}>Close</button></div>
             <label className="field"><span>Title</span><input name="title" required defaultValue={editing.title} /></label>
             <label className="field"><span>Notes</span><textarea name="notes" defaultValue={editing.notes} /></label>
             <label className="field"><span>Priority</span><select name="priority" defaultValue={editing.priority}>{priorityOptions.map(([value, meta]) => <option key={value} value={value}>{meta.label}</option>)}</select></label>

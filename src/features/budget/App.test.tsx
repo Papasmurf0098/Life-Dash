@@ -167,11 +167,11 @@ describe('App', () => {
 
     render(<App />)
 
-    expect(screen.getAllByText(/keep upcoming bills in view/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/bill reminders/i).length).toBeGreaterThan(0)
     await user.selectOptions(screen.getAllByLabelText(/reminder timing/i)[0], '3')
 
     await waitFor(() =>
-      expect(screen.queryAllByText(/keep upcoming bills in view/i)).toHaveLength(0),
+      expect(screen.queryAllByText(/bill reminders/i)).toHaveLength(0),
     )
     expect(screen.getByRole('button', { name: /reminder settings/i })).toBeInTheDocument()
   })
@@ -203,9 +203,9 @@ describe('App', () => {
 
     render(<App />)
 
-    expect(screen.queryAllByText(/keep upcoming bills in view/i)).toHaveLength(0)
+    expect(screen.queryAllByText(/bill reminders/i)).toHaveLength(0)
     await user.click(screen.getByRole('button', { name: /reminder settings/i }))
-    expect(screen.getAllByText(/keep upcoming bills in view/i).length).toBeGreaterThan(0)
+    expect(screen.getAllByText(/bill reminders/i).length).toBeGreaterThan(0)
   })
 
   it('falls back to in-app reminders when notification permission is denied', async () => {
