@@ -3,6 +3,7 @@ import {
   aggregateShifts,
   FOOD_TIP_OUT_RATE,
   getCurrentWeekShifts,
+  getRecentWeeklyEarnings,
   HOURLY_WAGE,
   LIQUOR_TIP_OUT_RATE,
   loadShiftEntries,
@@ -12,7 +13,10 @@ import {
   saveShiftEntries,
   TIP_TAGS,
   type ShiftEntry,
+  type ShiftTotals,
+  type WeeklyEarningsPoint,
 } from './tips'
+import Icon from '../../shared/Icon'
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
 
@@ -36,6 +40,83 @@ function groupBySection(entries: ShiftEntry[]) {
   entries.forEach((entry) => groups.set(entry.section, [...(groups.get(entry.section) ?? []), entry]))
   return Array.from(groups, ([section, shifts]) => ({ section, ...aggregateShifts(shifts) }))
     .toSorted((left, right) => right.avgHourly - left.avgHourly)
+}
+
+function EarningsVisuals({ totals, trend }: { totals: ShiftTotals; trend: WeeklyEarningsPoint[] }) {
+  const compositionTotal = Math.max(0, totals.basePay) + Math.max(0, totals.netTips)
+  const baseWidth = compositionTotal ? (Math.max(0, totals.basePay) / compositionTotal) * 100 : 0
+  const tipsWidth = compositionTotal ? (Math.max(0, totals.netTips) / compositionTotal) * 100 : 0
+  const width = 640
+  const height = 190
+  const padX = 22
+  const padY = 24
+  const chartWidth = width - padX * 2
+  const chartHeight = height - padY * 2
+  const maximum = Math.max(...trend.map((point) => point.projectedEarnings), 1)
+  const points = trend.map((point, index) => ({
+    ...point,
+    x: padX + (trend.length === 1 ? chartWidth / 2 : (index / (trend.length - 1)) * chartWidth),
+    y: padY + chartHeight - (point.projectedEarnings / maximum) * chartHeight,
+  }))
+  const linePath = points.map((point, index) => `${index ? 'L' : 'M'} ${point.x} ${point.y}`).join(' ')
+  const areaPath = points.length
+    ? `${linePath} L ${points.at(-1)?.x ?? padX} ${height - padY} L ${points[0].x} ${height - padY} Z`
+    : ''
+  const activePoints = trend.filter((point) => point.shifts)
+  const bestWeek = activePoints.toSorted((left, right) => right.projectedEarnings - left.projectedEarnings)[0]
+  const currentWeek = trend.at(-1)
+
+  return (
+    <section className="earnings-visuals" aria-label="Projected earnings visuals">
+      <article className="visual-panel composition-card">
+        <div className="visual-heading">
+          <span className="visual-icon"><Icon name="wallet" size={18} /></span>
+          <div><p className="kicker">Earnings anatomy</p><h2>{currency.format(totals.projectedEarnings)}</h2></div>
+        </div>
+        <p className="visual-support">Projected earnings in the current view, after estimated tip-out and before taxes or paycheck deductions.</p>
+        <div className="composition-track" role="img" aria-label={`${currency.format(totals.basePay)} base pay and ${currency.format(totals.netTips)} net tips`}>
+          <span className="composition-track__base" style={{ width: `${baseWidth}%` }} />
+          <span className="composition-track__tips" style={{ width: `${tipsWidth}%` }} />
+        </div>
+        <div className="composition-legend">
+          <span><i className="legend-dot legend-dot--base" />Base pay <strong>{currency.format(totals.basePay)}</strong></span>
+          <span><i className="legend-dot legend-dot--tips" />Net tips <strong>{currency.format(totals.netTips)}</strong></span>
+        </div>
+        <div className="tipout-breakdown">
+          <span><Icon name="plate" size={16} />Food tip-out <strong>−{currency.format(totals.foodTipOut)}</strong></span>
+          <span><Icon name="cocktail" size={16} />Liquor tip-out <strong>−{currency.format(totals.liquorTipOut)}</strong></span>
+        </div>
+      </article>
+
+      <article className="visual-panel trend-card">
+        <div className="visual-heading">
+          <span className="visual-icon"><Icon name="trend" size={18} /></span>
+          <div><p className="kicker">Eight-week signal</p><h2>{currentWeek ? currency.format(currentWeek.projectedEarnings) : '$0.00'}</h2></div>
+        </div>
+        <div className="trend-chart">
+          <svg role="img" aria-label="Projected earnings by Friday-through-Thursday week" viewBox={`0 0 ${width} ${height}`}>
+            <defs>
+              <linearGradient id="trend-area" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stopColor="var(--module-accent)" stopOpacity=".52" />
+                <stop offset="100%" stopColor="var(--module-secondary)" stopOpacity=".02" />
+              </linearGradient>
+              <linearGradient id="trend-line" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0%" stopColor="var(--module-secondary)" />
+                <stop offset="55%" stopColor="var(--module-accent)" />
+                <stop offset="100%" stopColor="var(--life-magenta)" />
+              </linearGradient>
+            </defs>
+            <path className="trend-gridline" d={`M ${padX} ${padY} H ${width - padX} M ${padX} ${padY + chartHeight / 2} H ${width - padX} M ${padX} ${height - padY} H ${width - padX}`} />
+            {areaPath ? <path className="trend-area" d={areaPath} /> : null}
+            {linePath ? <path className="trend-line" d={linePath} /> : null}
+            {points.map((point) => <circle key={point.weekStart} className={point.shifts ? 'trend-point is-active' : 'trend-point'} cx={point.x} cy={point.y} r={point.shifts ? 5 : 3}><title>{point.label}: {currency.format(point.projectedEarnings)} across {point.shifts} shifts</title></circle>)}
+          </svg>
+          <div className="trend-axis"><span>{trend[0]?.label ?? ''}</span><span>{trend.at(-1)?.label ?? ''}</span></div>
+        </div>
+        <div className="trend-footer"><span>Best week <strong>{bestWeek ? currency.format(bestWeek.projectedEarnings) : 'No shifts yet'}</strong></span><span>Current tip-out <strong>−{currency.format(currentWeek?.tipOut ?? 0)}</strong></span></div>
+      </article>
+    </section>
+  )
 }
 
 interface Draft {
@@ -80,6 +161,7 @@ export default function TipTrackerPage() {
   }, [entries, sectionFilter, weekOnly])
   const totals = useMemo(() => aggregateShifts(visibleEntries), [visibleEntries])
   const weekTotals = useMemo(() => aggregateShifts(getCurrentWeekShifts(entries)), [entries])
+  const weeklyTrend = useMemo(() => getRecentWeeklyEarnings(entries), [entries])
   const sectionStats = useMemo(() => groupBySection(visibleEntries), [visibleEntries])
   const maxSectionHourly = Math.max(...sectionStats.map((section) => section.avgHourly), 1)
   const sections = [...new Set(entries.map((entry) => entry.section))].toSorted()
@@ -122,6 +204,8 @@ export default function TipTrackerPage() {
         <div><span>Projected / hour</span><strong>{currency.format(totals.avgHourly)}</strong></div>
       </section>
 
+      <EarningsVisuals totals={totals} trend={weeklyTrend} />
+
       <section className="glass-panel">
         <div className="section-title-row">
           <div><p className="kicker">{editingId ? 'Edit shift' : 'Log shift'}</p><h2>{editingId ? 'Correct the record' : 'Capture the whole service picture'}</h2></div>
@@ -152,8 +236,8 @@ export default function TipTrackerPage() {
           <label className="field"><span>Section</span><input required value={draft.section} onChange={(event) => setDraft({ ...draft, section: event.target.value })} placeholder="Patio, 20s, bar" /></label>
           <label className="field"><span>Hours worked</span><input required inputMode="decimal" type="number" min="0.01" step="0.01" value={draft.hours} onChange={(event) => setDraft({ ...draft, hours: event.target.value })} placeholder="6.5" /></label>
           <label className="field"><span>Tips before tip-out</span><input required inputMode="decimal" type="number" min="0" step="0.01" value={draft.tips} onChange={(event) => setDraft({ ...draft, tips: event.target.value })} placeholder="225.00" /></label>
-          <label className="field"><span>Total food sales <em>optional · 2%</em></span><input inputMode="decimal" type="number" min="0" step="0.01" value={draft.foodSales} onChange={(event) => setDraft({ ...draft, foodSales: event.target.value })} placeholder="1000.00" /></label>
-          <label className="field"><span>Total liquor sales <em>optional · 8%</em></span><input inputMode="decimal" type="number" min="0" step="0.01" value={draft.liquorSales} onChange={(event) => setDraft({ ...draft, liquorSales: event.target.value })} placeholder="250.00" /></label>
+          <label className="field"><span className="field-label--icon"><Icon name="plate" size={15} />Total food sales <em>optional · 2%</em></span><input inputMode="decimal" type="number" min="0" step="0.01" value={draft.foodSales} onChange={(event) => setDraft({ ...draft, foodSales: event.target.value })} placeholder="1000.00" /></label>
+          <label className="field"><span className="field-label--icon"><Icon name="cocktail" size={15} />Total liquor sales <em>optional · 8%</em></span><input inputMode="decimal" type="number" min="0" step="0.01" value={draft.liquorSales} onChange={(event) => setDraft({ ...draft, liquorSales: event.target.value })} placeholder="250.00" /></label>
           <label className="field field--wide"><span>Notes <em>optional</em></span><input value={draft.notes} onChange={(event) => setDraft({ ...draft, notes: event.target.value })} placeholder="Event, weather, staffing, table mix" /></label>
           <fieldset className="chip-field field--wide">
             <legend>Shift signals</legend>

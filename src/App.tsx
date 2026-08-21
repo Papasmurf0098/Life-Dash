@@ -5,14 +5,15 @@ import BudgetPage from './features/budget/App'
 import TipTrackerPage from './features/tips/TipTrackerPage'
 import { LIFE_DASH_DATA_EVENT } from './shared/events'
 import { downloadLifeDashBackup, restoreLifeDashBackup } from './shared/backup'
+import Icon, { type IconName } from './shared/Icon'
 
 export type AppRoute = 'home' | 'bulletin' | 'tips' | 'budget'
 
-const ROUTES: Array<{ id: AppRoute; label: string; shortLabel: string; glyph: string }> = [
-  { id: 'home', label: 'Overview', shortLabel: 'Home', glyph: '⌂' },
-  { id: 'bulletin', label: 'Bulletin', shortLabel: 'Bulletin', glyph: '✦' },
-  { id: 'tips', label: 'Shift Tracker', shortLabel: 'Shifts', glyph: '↗' },
-  { id: 'budget', label: 'Take-home Budget', shortLabel: 'Budget', glyph: '$' },
+const ROUTES: Array<{ id: AppRoute; label: string; shortLabel: string; icon: IconName }> = [
+  { id: 'home', label: 'Overview', shortLabel: 'Home', icon: 'orbit' },
+  { id: 'bulletin', label: 'Bulletin', shortLabel: 'Bulletin', icon: 'bulletin' },
+  { id: 'tips', label: 'Shift Tracker', shortLabel: 'Shifts', icon: 'shifts' },
+  { id: 'budget', label: 'Take-home Budget', shortLabel: 'Budget', icon: 'wallet' },
 ]
 
 function getInitialRoute(): AppRoute {
@@ -46,7 +47,7 @@ export default function App() {
   }, [])
 
   return (
-    <div className="life-shell">
+    <div className={`life-shell route-${route}`}>
       <aside className="life-sidebar">
         <button className="life-brand" type="button" onClick={() => navigate('home')} aria-label="Life Dash home">
           <span className="life-brand__mark">L</span>
@@ -54,14 +55,14 @@ export default function App() {
         </button>
         <nav className="primary-nav" aria-label="Life Dash sections">
           {ROUTES.map((item) => (
-            <button key={item.id} type="button" className={route === item.id ? 'is-active' : ''} onClick={() => navigate(item.id)}>
-              <span className="nav-glyph" aria-hidden="true">{item.glyph}</span><span>{item.label}</span>
+            <button key={item.id} type="button" className={`nav-route-${item.id} ${route === item.id ? 'is-active' : ''}`} onClick={() => navigate(item.id)}>
+              <span className="nav-glyph"><Icon name={item.icon} size={18} /></span><span>{item.label}</span>
             </button>
           ))}
         </nav>
         <div className="sidebar-foot">
           <p><span className="privacy-dot" />Stored privately on this device</p>
-          <button type="button" onClick={() => setBackupOpen(true)}>Backup & restore</button>
+          <button className="icon-label" type="button" onClick={() => setBackupOpen(true)}><Icon name="backup" size={15} />Backup & restore</button>
         </div>
       </aside>
 
@@ -69,7 +70,7 @@ export default function App() {
         <header className="life-topbar">
           <div><span className="topbar-status" />Local-first</div>
           <p>{new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })}</p>
-          <button type="button" onClick={() => setBackupOpen(true)}>Backup</button>
+          <button className="icon-label" type="button" onClick={() => setBackupOpen(true)}><Icon name="backup" size={15} />Backup</button>
         </header>
         <main id="main-content" key={route}>
           {route === 'home' ? <HomePage onNavigate={navigate} revision={revision} /> : null}
@@ -81,7 +82,7 @@ export default function App() {
 
       <nav className="mobile-nav" aria-label="Life Dash sections">
         {ROUTES.map((item) => (
-          <button key={item.id} type="button" className={route === item.id ? 'is-active' : ''} onClick={() => navigate(item.id)}><span aria-hidden="true">{item.glyph}</span><small>{item.shortLabel}</small></button>
+          <button key={item.id} type="button" className={`nav-route-${item.id} ${route === item.id ? 'is-active' : ''}`} onClick={() => navigate(item.id)}><Icon name={item.icon} size={19} /><small>{item.shortLabel}</small></button>
         ))}
       </nav>
 

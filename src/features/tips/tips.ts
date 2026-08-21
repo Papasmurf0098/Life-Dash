@@ -51,6 +51,15 @@ export interface ShiftTotals {
   avgHourly: number
 }
 
+export interface WeeklyEarningsPoint {
+  weekStart: string
+  weekEnd: string
+  label: string
+  projectedEarnings: number
+  tipOut: number
+  shifts: number
+}
+
 function makeId(): string {
   return globalThis.crypto?.randomUUID?.() ?? `shift_${Date.now()}_${Math.random().toString(36).slice(2)}`
 }
@@ -217,6 +226,37 @@ export function getCurrentWeekShifts(entries: ShiftEntry[], now = new Date()): S
   const startKey = toLocalDateString(start)
   const endKey = toLocalDateString(end)
   return entries.filter((entry) => entry.date >= startKey && entry.date <= endKey)
+}
+
+export function getRecentWeeklyEarnings(
+  entries: ShiftEntry[],
+  now = new Date(),
+  weekCount = 8,
+): WeeklyEarningsPoint[] {
+  const count = Math.min(52, Math.max(1, Math.floor(weekCount)))
+  const currentStart = getFridayWeekRange(now).start
+
+  return Array.from({ length: count }, (_, index) => {
+    const weeksAgo = count - index - 1
+    const start = new Date(currentStart)
+    start.setDate(currentStart.getDate() - weeksAgo * 7)
+    const end = new Date(start)
+    end.setDate(start.getDate() + 6)
+    const weekStart = toLocalDateString(start)
+    const weekEnd = toLocalDateString(end)
+    const totals = aggregateShifts(
+      entries.filter((entry) => entry.date >= weekStart && entry.date <= weekEnd),
+    )
+
+    return {
+      weekStart,
+      weekEnd,
+      label: start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      projectedEarnings: totals.projectedEarnings,
+      tipOut: totals.tipOut,
+      shifts: totals.shifts,
+    }
+  })
 }
 
 export function projectCurrentMonthEarnings(entries: ShiftEntry[], now = new Date()): number {
