@@ -1,1 +1,0 @@
-# Anchor Tip Tracker
