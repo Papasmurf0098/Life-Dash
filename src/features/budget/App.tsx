@@ -208,9 +208,9 @@ function SectionPanel({
   onToggle,
   children,
 }: {
-  eyebrow: string
+  eyebrow?: string
   title: string
-  description: string
+  description?: string
   graphicKind: SectionKey
   isOpen: boolean
   onToggle: () => void
@@ -228,9 +228,9 @@ function SectionPanel({
       <PanelGraphic kind={graphicKind} />
       <div className="section-heading">
         <div className="section-heading__copy">
-          <p className="eyebrow">{eyebrow}</p>
+          {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
           <h3>{title}</h3>
-          <p className="support-copy">{description}</p>
+          {description ? <p className="support-copy">{description}</p> : null}
         </div>
         <button
           className="ghost-button section-toggle"
@@ -242,7 +242,7 @@ function SectionPanel({
         </button>
       </div>
 
-      {isOpen ? <div className="section-content">{children}</div> : <p className="section-collapsed-note">Section collapsed.</p>}
+      {isOpen ? <div className="section-content">{children}</div> : null}
     </motion.section>
   )
 }
@@ -615,11 +615,7 @@ function App() {
         transition={{ duration: 0.45, ease: 'easeOut' }}
       >
         <div className="app-header__lead">
-          <p className="eyebrow">Take-home budget</p>
-          <h1>Budget the money that actually reached you.</h1>
-          <p className="header-copy">
-            Keep paycheck deposits, live spending, monthly bills, and bucket balances in one phone-friendly view.
-          </p>
+          <h1>Budget</h1>
         </div>
 
         <div className="header-graphic" aria-hidden="true">
@@ -724,11 +720,7 @@ function App() {
         <PanelGraphic kind="reminders" />
         <div className="section-heading reminder-panel__heading">
           <div className="section-heading__copy">
-            <p className="eyebrow">Reminders</p>
-            <h3>Keep upcoming bills in view.</h3>
-            <p className="support-copy">
-              These reminders stay local to this device. Browser notifications only fire while the app is open.
-            </p>
+            <h3>Bill reminders</h3>
           </div>
         </div>
 
@@ -840,11 +832,11 @@ function App() {
                 </article>
               ))
             ) : (
-              <p className="empty-state">No bills are coming up inside your current reminder window.</p>
+              <p className="empty-state">No upcoming bills.</p>
             )}
           </div>
         ) : (
-          <p className="empty-state">Reminders are off. Turn them on to see upcoming bill alerts.</p>
+          <p className="empty-state">Reminders are off.</p>
         )}
         </motion.section>
       ) : null}
@@ -861,7 +853,7 @@ function App() {
           <div>
             <p className="eyebrow">{getMonthLabel(selectedMonth)}</p>
             <h2>{formatCurrency(snapshot.availableRemainingCents)}</h2>
-            <p className="support-copy">Left in plan after expected take-home pay and logged spending.</p>
+            <p className="support-copy">Remaining</p>
           </div>
 
           <label className="field field--compact">
@@ -908,9 +900,7 @@ function App() {
 
       <main className="section-stack">
         <SectionPanel
-          eyebrow="Income"
-          title="Track take-home pay"
-          description="Log only money that actually reached you after taxes, deductions, and paycheck adjustments."
+          title="Take-home pay"
           graphicKind="income"
           isOpen={openSections.income}
           onToggle={() => toggleSection('income')}
@@ -1076,14 +1066,12 @@ function App() {
                 )
               })}
             </AnimatePresence>
-            {!snapshot.incomes.length ? <p className="empty-state">No take-home pay logged for this month yet.</p> : null}
+            {!snapshot.incomes.length ? <p className="empty-state">No take-home pay.</p> : null}
           </div>
         </SectionPanel>
 
         <SectionPanel
-          eyebrow="Expenses"
-          title="Log spending"
-          description="Every save updates your month total and bucket balance instantly."
+          title="Expenses"
           graphicKind="expenses"
           isOpen={openSections.expenses}
           onToggle={() => toggleSection('expenses')}
@@ -1296,14 +1284,12 @@ function App() {
                 )
               })}
             </AnimatePresence>
-            {!snapshot.expenses.length ? <p className="empty-state">No expenses logged for this month yet.</p> : null}
+            {!snapshot.expenses.length ? <p className="empty-state">No expenses.</p> : null}
           </div>
         </SectionPanel>
 
         <SectionPanel
-          eyebrow="Recurring bills"
-          title="Track required monthly spend"
-          description="Mark bills paid to create matching expense entries automatically."
+          title="Recurring bills"
           graphicKind="bills"
           isOpen={openSections.bills}
           onToggle={() => toggleSection('bills')}
@@ -1513,14 +1499,12 @@ function App() {
                 </article>
               )
             })}
-            {!snapshot.billSummaries.length ? <p className="empty-state">No recurring bills yet.</p> : null}
+            {!snapshot.billSummaries.length ? <p className="empty-state">No recurring bills.</p> : null}
           </div>
         </SectionPanel>
 
         <SectionPanel
-          eyebrow="Buckets"
-          title="Budget each category"
-          description="Set each bucket for the month, then watch spent and left update automatically."
+          title="Budget categories"
           graphicKind="buckets"
           isOpen={openSections.buckets}
           onToggle={() => toggleSection('buckets')}

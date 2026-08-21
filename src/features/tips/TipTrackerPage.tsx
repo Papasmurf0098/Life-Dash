@@ -71,9 +71,8 @@ function EarningsVisuals({ totals, trend }: { totals: ShiftTotals; trend: Weekly
       <article className="visual-panel composition-card">
         <div className="visual-heading">
           <span className="visual-icon"><Icon name="wallet" size={18} /></span>
-          <div><p className="kicker">Earnings anatomy</p><h2>{currency.format(totals.projectedEarnings)}</h2></div>
+          <div><p className="kicker">Earnings breakdown</p><h2>{currency.format(totals.projectedEarnings)}</h2></div>
         </div>
-        <p className="visual-support">Projected earnings in the current view, after estimated tip-out and before taxes or paycheck deductions.</p>
         <div className="composition-track" role="img" aria-label={`${currency.format(totals.basePay)} base pay and ${currency.format(totals.netTips)} net tips`}>
           <span className="composition-track__base" style={{ width: `${baseWidth}%` }} />
           <span className="composition-track__tips" style={{ width: `${tipsWidth}%` }} />
@@ -91,7 +90,7 @@ function EarningsVisuals({ totals, trend }: { totals: ShiftTotals; trend: Weekly
       <article className="visual-panel trend-card">
         <div className="visual-heading">
           <span className="visual-icon"><Icon name="trend" size={18} /></span>
-          <div><p className="kicker">Eight-week signal</p><h2>{currentWeek ? currency.format(currentWeek.projectedEarnings) : '$0.00'}</h2></div>
+          <div><p className="kicker">8-week trend</p><h2>{currentWeek ? currency.format(currentWeek.projectedEarnings) : '$0.00'}</h2></div>
         </div>
         <div className="trend-chart">
           <svg role="img" aria-label="Projected earnings by Friday-through-Thursday week" viewBox={`0 0 ${width} ${height}`}>
@@ -184,16 +183,14 @@ export default function TipTrackerPage() {
     <div className="feature-page tips-page">
       <section className="feature-hero feature-hero--cyan">
         <div>
-          <p className="kicker">Shift intelligence</p>
-          <h1>Know what the room is really worth.</h1>
-          <p>Track service patterns and estimate gross shift earnings before taxes, paycheck deductions, and other costs.</p>
+          <h1>Shift Tracker</h1>
         </div>
         <div className="earnings-signal" aria-hidden="true"><i /><i /><i /><i /><i /></div>
       </section>
 
       <aside className="truth-banner">
-        <strong>Projection, not take-home pay.</strong>
-        <span>Tip Tracker never adds money to Budget. Only take-home pay you deliberately record in Budget counts as income.</span>
+        <strong>Projection only</strong>
+        <span>Pre-tax. Does not update Budget.</span>
       </aside>
 
       <section className="metric-strip metric-strip--five" aria-label="Current shift totals">
@@ -208,7 +205,7 @@ export default function TipTrackerPage() {
 
       <section className="glass-panel">
         <div className="section-title-row">
-          <div><p className="kicker">{editingId ? 'Edit shift' : 'Log shift'}</p><h2>{editingId ? 'Correct the record' : 'Capture the whole service picture'}</h2></div>
+          <div><h2>{editingId ? 'Edit shift' : 'New shift'}</h2></div>
           {editingId ? <button className="text-action" type="button" onClick={resetDraft}>Cancel edit</button> : null}
         </div>
 
@@ -240,7 +237,7 @@ export default function TipTrackerPage() {
           <label className="field"><span className="field-label--icon"><Icon name="cocktail" size={15} />Total liquor sales <em>optional · 8%</em></span><input inputMode="decimal" type="number" min="0" step="0.01" value={draft.liquorSales} onChange={(event) => setDraft({ ...draft, liquorSales: event.target.value })} placeholder="250.00" /></label>
           <label className="field field--wide"><span>Notes <em>optional</em></span><input value={draft.notes} onChange={(event) => setDraft({ ...draft, notes: event.target.value })} placeholder="Event, weather, staffing, table mix" /></label>
           <fieldset className="chip-field field--wide">
-            <legend>Shift signals</legend>
+            <legend>Tags</legend>
             <div className="chip-row">
               {TIP_TAGS.map((tag) => (
                 <button key={tag} className={`choice-chip ${draft.tags.includes(tag) ? 'is-active' : ''}`} type="button" onClick={() => setDraft({ ...draft, tags: draft.tags.includes(tag) ? draft.tags.filter((value) => value !== tag) : [...draft.tags, tag] })}>{tag}</button>
@@ -261,19 +258,18 @@ export default function TipTrackerPage() {
       <section className="insight-grid">
         <article className="glass-panel insight-card">
           <p className="kicker">Friday–Thursday</p><h2>{currency.format(weekTotals.projectedEarnings)}</h2>
-          <p>Projected across {weekTotals.shifts} shift{weekTotals.shifts === 1 ? '' : 's'} · {weekTotals.hours.toFixed(1)} hours.</p>
+          <p>{weekTotals.shifts} shift{weekTotals.shifts === 1 ? '' : 's'} · {weekTotals.hours.toFixed(1)} hours</p>
           <div className="detail-pairs"><span>Net tips <b>{currency.format(weekTotals.netTips)}</b></span><span>Base pay <b>{currency.format(weekTotals.basePay)}</b></span></div>
         </article>
         <article className="glass-panel insight-card insight-card--violet">
-          <p className="kicker">Month pace</p><h2>{currency.format(projectCurrentMonthEarnings(entries))}</h2>
-          <p>Projected month-end gross earnings based on recorded pace so far.</p>
-          <small>This is directional—not a paycheck or tax estimate.</small>
+          <p className="kicker">Month projection</p><h2>{currency.format(projectCurrentMonthEarnings(entries))}</h2>
+          <small>Pre-tax</small>
         </article>
       </section>
 
       <section className="glass-panel">
         <div className="section-title-row">
-          <div><p className="kicker">Pattern read</p><h2>Where your time performs</h2></div>
+          <div><h2>Section performance</h2></div>
           <div className="toolbar-actions">
             <button className={`text-action ${weekOnly ? 'is-active' : ''}`} type="button" onClick={() => setWeekOnly(!weekOnly)}>This week</button>
             <select aria-label="Filter section" value={sectionFilter} onChange={(event) => setSectionFilter(event.target.value)}><option value="">All sections</option>{sections.map((section) => <option key={section}>{section}</option>)}</select>
@@ -287,13 +283,13 @@ export default function TipTrackerPage() {
               <strong>{currency.format(section.avgHourly)}/hr</strong>
             </article>
           ))}
-          {!sectionStats.length ? <div className="empty-state"><strong>No signal yet.</strong><span>Log shifts to compare sections.</span></div> : null}
+          {!sectionStats.length ? <div className="empty-state"><strong>No shift data</strong></div> : null}
         </div>
       </section>
 
       <section className="glass-panel">
         <div className="section-title-row">
-          <div><p className="kicker">History</p><h2>Shift ledger</h2></div>
+          <div><h2>Shift history</h2></div>
           <div className="toolbar-actions">
             <button className="text-action" type="button" onClick={() => downloadJson(entries)}>Export</button>
             <button className="text-action" type="button" onClick={() => importRef.current?.click()}>Import</button>
@@ -317,7 +313,7 @@ export default function TipTrackerPage() {
               <div className="item-actions"><button className="icon-action" type="button" onClick={() => { setEditingId(entry.id); setDraft({ date: entry.date, section: entry.section, hours: String(entry.hours), tips: String(entry.tips), foodSales: entry.foodSales === null ? '' : String(entry.foodSales), liquorSales: entry.liquorSales === null ? '' : String(entry.liquorSales), notes: entry.notes, tags: entry.tags }); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>Edit</button><button className="icon-action icon-action--danger" type="button" onClick={() => commit(entries.filter((shift) => shift.id !== entry.id))}>Delete</button></div>
             </article>
           ))}
-          {!visibleEntries.length ? <div className="empty-state"><strong>No shifts in this view.</strong><span>Log a shift or clear the filters.</span></div> : null}
+          {!visibleEntries.length ? <div className="empty-state"><strong>No shifts</strong></div> : null}
         </div>
       </section>
     </div>

@@ -51,7 +51,7 @@ export default function App() {
       <aside className="life-sidebar">
         <button className="life-brand" type="button" onClick={() => navigate('home')} aria-label="Life Dash home">
           <span className="life-brand__mark">L</span>
-          <span><strong>Life Dash</strong><small>Personal command center</small></span>
+          <span><strong>Life Dash</strong></span>
         </button>
         <nav className="primary-nav" aria-label="Life Dash sections">
           {ROUTES.map((item) => (
@@ -61,7 +61,7 @@ export default function App() {
           ))}
         </nav>
         <div className="sidebar-foot">
-          <p><span className="privacy-dot" />Stored privately on this device</p>
+          <p><span className="privacy-dot" />Local data</p>
           <button className="icon-label" type="button" onClick={() => setBackupOpen(true)}><Icon name="backup" size={15} />Backup & restore</button>
         </div>
       </aside>
@@ -89,8 +89,8 @@ export default function App() {
       {backupOpen ? (
         <div className="modal-backdrop" role="presentation" onMouseDown={() => setBackupOpen(false)}>
           <section className="modal-card backup-card" role="dialog" aria-modal="true" aria-labelledby="backup-title" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="section-title-row"><div><p className="kicker">Data safety</p><h2 id="backup-title">One backup for your whole dashboard</h2></div><button className="icon-action" type="button" onClick={() => setBackupOpen(false)}>Close</button></div>
-            <p>Download Bulletin, Shift Tracker, and Budget together. Restoring replaces the current data in all three modules after the file is validated.</p>
+            <div className="section-title-row"><div><h2 id="backup-title">Backup & restore</h2></div><button className="icon-action" type="button" onClick={() => setBackupOpen(false)}>Close</button></div>
+            <p>Includes Bulletin, Shifts, and Budget. Restore replaces current data.</p>
             <div className="backup-actions">
               <button className="primary-action" type="button" onClick={downloadLifeDashBackup}>Download full backup</button>
               <button className="secondary-action" type="button" onClick={() => importRef.current?.click()}>Restore from backup</button>
@@ -108,7 +108,7 @@ export default function App() {
                 }
               }} />
             </div>
-            <p className="status-message" role="status">{restoreMessage || 'Your data remains local unless you download and move the backup file yourself.'}</p>
+            <p className="status-message" role="status">{restoreMessage || 'Stored locally on this device.'}</p>
           </section>
         </div>
       ) : null}
