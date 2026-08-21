@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   aggregateShifts,
   FOOD_TIP_OUT_RATE,
+  getRecentWeeklyEarnings,
   HOURLY_WAGE,
   LIQUOR_TIP_OUT_RATE,
   normalizeShift,
@@ -87,5 +88,18 @@ describe('shift earnings projection', () => {
 
     expect(window.localStorage.getItem(TIP_STORAGE_KEY)).toContain('projectedEarnings')
     expect(window.localStorage.getItem('budget-app-data-v2')).toBe('take-home-sentinel')
+  })
+
+  it('builds a Friday-through-Thursday earnings trend', () => {
+    const entries = [
+      normalizeShift({ date: '2026-08-14', section: 'Patio', hours: 5, tips: 150 }),
+      normalizeShift({ date: '2026-08-20', section: 'Bar', hours: 4, tips: 140, liquorSales: 100 }),
+      normalizeShift({ date: '2026-08-21', section: 'Patio', hours: 6, tips: 200, foodSales: 500 }),
+    ].filter((entry) => entry !== null)
+
+    expect(getRecentWeeklyEarnings(entries, new Date('2026-08-22T12:00:00'), 2)).toMatchObject([
+      { weekStart: '2026-08-14', weekEnd: '2026-08-20', shifts: 2, projectedEarnings: 390 },
+      { weekStart: '2026-08-21', weekEnd: '2026-08-27', shifts: 1, projectedEarnings: 262 },
+    ])
   })
 })
