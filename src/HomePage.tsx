@@ -4,6 +4,7 @@ import { deriveMonthSnapshot, formatCurrency, getCurrentMonthKey } from './featu
 import { loadBudgetData } from './features/budget/storage'
 import { aggregateShifts, getCurrentWeekShifts, loadShiftEntries, projectCurrentMonthEarnings } from './features/tips/tips'
 import type { AppRoute } from './App'
+import CosmicGlyph from './shared/CosmicGlyph'
 import Icon from './shared/Icon'
 
 interface HomePageProps {
@@ -38,7 +39,7 @@ export default function HomePage({ onNavigate, revision }: HomePageProps) {
           <h1>Overview</h1>
           <div className="hero-actions"><button className="primary-action" type="button" onClick={() => onNavigate('bulletin')}>Add item</button><button className="secondary-action" type="button" onClick={() => onNavigate('tips')}>Log shift</button></div>
         </div>
-        <div className="constellation" aria-hidden="true"><span className="constellation__core" /><i /><i /><i /><i /><i /></div>
+        <CosmicGlyph variant="overview" />
       </section>
 
       <section className="home-grid">

@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import CosmicGlyph from '../../shared/CosmicGlyph'
 import {
   createBulletinItem,
   isDueToday,
@@ -79,7 +80,7 @@ export default function BulletinPage() {
         <div>
           <h1>Bulletin</h1>
         </div>
-        <div className="hero-orbit" aria-hidden="true"><span /><span /><span /></div>
+        <CosmicGlyph variant="bulletin" />
       </section>
 
       <section className="metric-strip" aria-label="Bulletin summary">

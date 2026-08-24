@@ -8,6 +8,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from 'react'
+import CosmicGlyph from '../../shared/CosmicGlyph'
 import './App.css'
 import { BUCKET_COLORS } from './constants'
 import {
@@ -618,50 +619,7 @@ function App() {
           <h1>Budget</h1>
         </div>
 
-        <div className="header-graphic" aria-hidden="true">
-          <motion.div
-            className="header-graphic__halo"
-            animate={{ scale: [1, 1.06, 1], opacity: [0.68, 0.92, 0.68] }}
-            transition={{ duration: 7, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="header-graphic__ring header-graphic__ring--outer"
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 20, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
-          />
-          <motion.div
-            className="header-graphic__ring header-graphic__ring--inner"
-            animate={{ rotate: [360, 0] }}
-            transition={{ duration: 14, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
-          />
-          <motion.div
-            className="header-graphic__core"
-            animate={{ y: [0, -8, 0], rotate: [0, 2, 0, -2, 0] }}
-            transition={{ duration: 6, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-          >
-            <div className="header-graphic__ledger">
-              <span />
-              <span />
-              <span />
-            </div>
-            <div className="header-graphic__coin" />
-          </motion.div>
-          <motion.span
-            className="header-graphic__orbit header-graphic__orbit--one"
-            animate={{ x: [0, 16, 0], y: [0, -22, 0] }}
-            transition={{ duration: 5.4, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-          />
-          <motion.span
-            className="header-graphic__orbit header-graphic__orbit--two"
-            animate={{ x: [0, -20, 0], y: [0, 16, 0] }}
-            transition={{ duration: 6.8, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-          />
-          <motion.span
-            className="header-graphic__orbit header-graphic__orbit--three"
-            animate={{ x: [0, 12, 0], y: [0, 18, 0] }}
-            transition={{ duration: 4.8, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-          />
-        </div>
+        <CosmicGlyph variant="budget" />
 
         <div className="header-actions">
           <label className="field field--compact">

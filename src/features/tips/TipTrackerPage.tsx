@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import CosmicGlyph from '../../shared/CosmicGlyph'
 import {
   aggregateShifts,
   FOOD_TIP_OUT_RATE,
@@ -185,7 +186,7 @@ export default function TipTrackerPage() {
         <div>
           <h1>Shift Tracker</h1>
         </div>
-        <div className="earnings-signal" aria-hidden="true"><i /><i /><i /><i /><i /></div>
+        <CosmicGlyph variant="earnings" />
       </section>
 
       <aside className="truth-banner">
